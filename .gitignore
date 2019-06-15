@@ -167,4 +167,7 @@ gradle-app.setting
 ### Gradle Patch ###
 **/build/
 
+### Kotlin test ###
+.kotlintest/*
+
 # End of https://www.gitignore.io/api/java,macos,kotlin,intellij+iml,gradle
