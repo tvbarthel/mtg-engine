@@ -2,6 +2,7 @@ package fr.tvbarthel.mtg.engine.playing.phase
 
 import fr.tvbarthel.mtg.engine.GameState
 import fr.tvbarthel.mtg.engine.Phase
+import fr.tvbarthel.mtg.engine.playing.step.*
 
 /**
  * The combat phase is the third phase in a turn, and has five steps in this order:
@@ -16,8 +17,18 @@ import fr.tvbarthel.mtg.engine.Phase
  *
  * https://mtg.gamepedia.com/Combat_phase
  */
-class CombatPhase : Phase {
+class CombatPhase(
+    private val beginningStep: BeginningStep = BeginningStep(),
+    private val attackersStep: AttackersStep = AttackersStep(),
+    private val blockersStep: BlockersStep = BlockersStep(),
+    private val damageStep: DamageStep = DamageStep(),
+    private val endOfCombatStep: EndOfCombatStep = EndOfCombatStep()
+) : Phase {
     override fun proceed(gameState: GameState): GameState {
-        return gameState
+        var intermediateState = beginningStep.proceed(gameState)
+        intermediateState = attackersStep.proceed(intermediateState)
+        intermediateState = blockersStep.proceed(intermediateState)
+        intermediateState = damageStep.proceed(intermediateState)
+        return endOfCombatStep.proceed(intermediateState)
     }
 }
