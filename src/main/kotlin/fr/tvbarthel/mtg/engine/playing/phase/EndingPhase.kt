@@ -2,6 +2,8 @@ package fr.tvbarthel.mtg.engine.playing.phase
 
 import fr.tvbarthel.mtg.engine.GameState
 import fr.tvbarthel.mtg.engine.Phase
+import fr.tvbarthel.mtg.engine.playing.step.CleanupStep
+import fr.tvbarthel.mtg.engine.playing.step.EndStep
 
 /**
  * The ending phase is the fifth and final phase of a turn.
@@ -13,8 +15,12 @@ import fr.tvbarthel.mtg.engine.Phase
  *
  * https://mtg.gamepedia.com/Ending_phase
  */
-class EndingPhase : Phase {
+class EndingPhase(
+    private val endStep: EndStep = EndStep(),
+    private val cleanupStep: CleanupStep = CleanupStep()
+) : Phase {
     override fun proceed(gameState: GameState): GameState {
-        return gameState
+        val intermediateState = endStep.proceed(gameState)
+        return cleanupStep.proceed(intermediateState)
     }
 }
