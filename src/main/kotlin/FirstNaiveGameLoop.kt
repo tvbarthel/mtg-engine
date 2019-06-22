@@ -3,41 +3,48 @@ fun main() {
 
     val player1 = ScriptedPlayer(
         scriptedActions = listOf(
+            // Turn 1 - player 1 priority
             mapOf(
                 Step.FirstMainPhaseStep to mutableListOf<Action>(
                     PlayLandAction()
                 )
             ),
+            // Turn 2 - player 2 priority
+            emptyMap(),
+            // Turn 3 - player 1 priority
             mapOf(
                 Step.FirstMainPhaseStep to mutableListOf<Action>(
                     PlayLandAction()
                 )
             ),
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    PlayLandAction()
-                )
-            )
+            // Turn 4 - player 2 priority
+            emptyMap(),
+            // Turn 5 - player 1 priority
+            emptyMap()
         )
     )
 
     val player2 = ScriptedPlayer(
         scriptedActions = listOf(
+            // Turn 1 - player 1 priority
+            emptyMap(),
+            // Turn 2 - player 2 priority
+            mapOf(
+                Step.FirstMainPhaseStep to mutableListOf<Action>(
+                    PlayLandAction(),
+                    SpawnCreature(SanctuaryCat())
+                )
+            ),
+            // Turn 3 - player 1 priority
+            emptyMap(),
+            // Turn 4 - player 2 priority
             mapOf(
                 Step.FirstMainPhaseStep to mutableListOf<Action>(
                     PlayLandAction()
                 )
             ),
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    PlayLandAction()
-                )
-            ),
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    PlayLandAction()
-                )
-            )
+            // Turn 5 - player 1 priority
+            emptyMap()
         )
     )
 
@@ -107,12 +114,19 @@ class PlayLandAction : Action {
     }
 }
 
+class SpawnCreature(val creatureCard: CreatureCard) : Action {
+
+    override fun toString(): String {
+        return "SpawnCreature Action $creatureCard"
+    }
+
+}
+
 interface Player {
 
     fun getAction(turn: Int, step: Step): Action?
 
 }
-
 
 class ScriptedPlayer(private val scriptedActions: List<Map<Step, MutableList<Action>>>) : Player {
 
@@ -135,4 +149,20 @@ class ScriptedPlayer(private val scriptedActions: List<Map<Step, MutableList<Act
         return actions.removeAt(0)
     }
 
+}
+
+interface Card {
+    fun getName(): String
+}
+
+abstract class CreatureCard(val power: Int, val toughness: Int) : Card {
+
+    override fun toString(): String {
+        return "CreatureCard{name: ${getName()}, power:$power, toughness:$toughness}"
+    }
+
+}
+
+class SanctuaryCat : CreatureCard(1, 2) {
+    override fun getName() = "SanctuaryCat"
 }
