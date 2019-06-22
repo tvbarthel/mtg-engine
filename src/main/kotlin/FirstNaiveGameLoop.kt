@@ -3,47 +3,51 @@ fun main() {
 
     val player1 = ScriptedPlayer(
         scriptedActions = listOf(
-            // Turn 1 - player 1 priority
+            // Turn 0 - player 1 priority
             mapOf(
                 Step.FirstMainPhaseStep to mutableListOf<Action>(
                     PlayLandAction()
                 )
             ),
-            // Turn 2 - player 2 priority
+            // Turn 1 - player 2 priority
             emptyMap(),
-            // Turn 3 - player 1 priority
+            // Turn 2 - player 1 priority
             mapOf(
                 Step.FirstMainPhaseStep to mutableListOf<Action>(
                     PlayLandAction()
                 )
             ),
-            // Turn 4 - player 2 priority
+            // Turn 3 - player 2 priority
             emptyMap(),
-            // Turn 5 - player 1 priority
+            // Turn 4 - player 1 priority
             emptyMap()
         )
     )
 
+    val sanctuaryCat = SanctuaryCat()
     val player2 = ScriptedPlayer(
         scriptedActions = listOf(
-            // Turn 1 - player 1 priority
+            // Turn 0 - player 1 priority
             emptyMap(),
-            // Turn 2 - player 2 priority
+            // Turn 1 - player 2 priority
             mapOf(
                 Step.FirstMainPhaseStep to mutableListOf<Action>(
                     PlayLandAction(),
-                    SpawnCreature(SanctuaryCat())
+                    SpawnCreatureAction(sanctuaryCat)
                 )
             ),
-            // Turn 3 - player 1 priority
+            // Turn 2 - player 1 priority
             emptyMap(),
-            // Turn 4 - player 2 priority
+            // Turn 3 - player 2 priority
             mapOf(
                 Step.FirstMainPhaseStep to mutableListOf<Action>(
                     PlayLandAction()
+                ),
+                Step.CombatPhaseDeclareAttackersStep to mutableListOf<Action>(
+                    DeclareAttackersAction(listOf(sanctuaryCat))
                 )
             ),
-            // Turn 5 - player 1 priority
+            // Turn 4 - player 1 priority
             emptyMap()
         )
     )
@@ -114,12 +118,18 @@ class PlayLandAction : Action {
     }
 }
 
-class SpawnCreature(val creatureCard: CreatureCard) : Action {
+class SpawnCreatureAction(val creatureCard: CreatureCard) : Action {
 
     override fun toString(): String {
         return "SpawnCreature Action $creatureCard"
     }
 
+}
+
+class DeclareAttackersAction(val creatureCards: List<CreatureCard>) : Action {
+    override fun toString(): String {
+        return "DeclareAttackers Action $creatureCards"
+    }
 }
 
 interface Player {
