@@ -12,25 +12,19 @@ class GameLoopTest : StringSpec({
         // Given
         val player1 = ScriptedPlayer("Ava")
         val player2 = ScriptedPlayer("Williams")
+        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
 
-        player1.scriptedActions = listOf(
-            // Turn 0 - player 1 priority
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    PlayLandAction(Plains("plains-card-p1-a"))
-                )
-            ),
-            // Turn 1 - player 2 priority
-            emptyMap(),
-            // Turn 2 - player 1 priority
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    PlayLandAction(Plains("plains-card-p1-b"))
-                )
-            )
-        )
+        scriptedActionBuilder
+            // Turn 0 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
+            // Turn 1 - player 2 active
+            .addTurn()
+            // Turn 2 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-b")))
 
-        player2.scriptedActions = emptyList()
+
+        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
+        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
 
         // When
         val gameLoop = instantiateGameLoop()
@@ -50,33 +44,26 @@ class GameLoopTest : StringSpec({
         val player1 = ScriptedPlayer("Ava")
         val player2 = ScriptedPlayer("Williams")
         val sanctuaryCat = SanctuaryCat("sanctuary-cat-1")
+        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
 
-        player1.scriptedActions = listOf(
-            // Turn 0 - player 1 priority
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    PlayLandAction(Plains("plains-card-p1-a"))
-                )
-            ),
-            // Turn 1 - player 2 priority
-            emptyMap(),
-            // Turn 2 - player 1 priority
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    SpawnCreatureAction(sanctuaryCat)
-                )
-            ),
-            // Turn 3 - player 2 priority
-            emptyMap(),
-            // Turn 4 - player 1 priority
-            mapOf(
-                Step.CombatPhaseDeclareAttackersStep to mutableListOf<Action>(
-                    DeclareAttackersAction(listOf(AttackAction(sanctuaryCat, player2)))
-                )
+        scriptedActionBuilder
+            // Turn 0 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
+            // Turn 1 - player 2 active
+            .addTurn()
+            // Turn 2 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, SpawnCreatureAction(sanctuaryCat))
+            // Turn 3 - player 2 active
+            .addTurn()
+            // Turn 4 - player 1 active
+            .addTurn(
+                Step.CombatPhaseDeclareAttackersStep,
+                player1,
+                DeclareAttackersAction(listOf(AttackAction(sanctuaryCat, player2)))
             )
-        )
 
-        player2.scriptedActions = emptyList()
+        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
+        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
 
         // When
         val gameLoop = instantiateGameLoop()
@@ -96,56 +83,37 @@ class GameLoopTest : StringSpec({
         val player2 = ScriptedPlayer("Williams")
         val sanctuaryCatP1 = SanctuaryCat("sanctuary-cat-p1")
         val sanctuaryCatP2 = SanctuaryCat("sanctuary-cat-p2")
+        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
 
-        player1.scriptedActions = listOf(
-            // Turn 0 - player 1 priority
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    PlayLandAction(Plains("plains-card-p1-a"))
-                )
-            ),
-            // Turn 1 - player 2 priority
-            emptyMap(),
-            // Turn 2 - player 1 priority
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    SpawnCreatureAction(sanctuaryCatP1)
-                )
-            ),
-            // Turn 3 - player 2 priority
-            emptyMap(),
-            // Turn 4 - player 1 priority
-            mapOf(
-                Step.CombatPhaseDeclareAttackersStep to mutableListOf<Action>(
-                    DeclareAttackersAction(listOf(AttackAction(sanctuaryCatP1, player2)))
+        scriptedActionBuilder
+            // Turn 0 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
+            // Turn 1 - player 2 active
+            .addTurn(Step.FirstMainPhaseStep, player2, PlayLandAction(Plains("plains-card-p2-a")))
+            // Turn 2 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, SpawnCreatureAction(sanctuaryCatP1))
+            // Turn 3 - player 2 active
+            .addTurn(Step.FirstMainPhaseStep, player2, SpawnCreatureAction(sanctuaryCatP2))
+            // Turn 4 - player 1 active
+            .addTurn(
+                mapOf(
+                    Step.CombatPhaseDeclareAttackersStep to listOf(
+                        Pair(
+                            player1,
+                            DeclareAttackersAction(listOf(AttackAction(sanctuaryCatP1, player2)))
+                        )
+                    ),
+                    Step.CombatPhaseDeclareBlockersStep to listOf(
+                        Pair(
+                            player2,
+                            DeclareBlockersAction(listOf(BlockAction(sanctuaryCatP1, listOf(sanctuaryCatP2))))
+                        )
+                    )
                 )
             )
-        )
 
-        player2.scriptedActions = listOf(
-            // Turn 0 - player 1 priority
-            emptyMap(),
-            // Turn 1 - player 2 priority
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    PlayLandAction(Plains("plains-card-p2-a"))
-                )
-            ),
-            // Turn 2 - player 1 priority
-            emptyMap(),
-            // Turn 3 - player 2 priority
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    SpawnCreatureAction(sanctuaryCatP2)
-                )
-            ),
-            // Turn 4 - player 1 priority
-            mapOf(
-                Step.CombatPhaseDeclareBlockersStep to mutableListOf<Action>(
-                    DeclareBlockersAction(listOf(BlockAction(sanctuaryCatP1, listOf(sanctuaryCatP2))))
-                )
-            )
-        )
+        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
+        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
 
         // When
         val gameLoop = instantiateGameLoop()
@@ -167,56 +135,37 @@ class GameLoopTest : StringSpec({
         val player2 = ScriptedPlayer("Williams")
         val fakeCreatureP1 = FakeCreature("fake-creature-p1", 4, 4)
         val fakeCreatureP2 = FakeCreature("fake-creature-p2", 1, 1)
+        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
 
-        player1.scriptedActions = listOf(
-            // Turn 0 - player 1 priority
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    PlayLandAction(Plains("plains-card-p1-a"))
-                )
-            ),
-            // Turn 1 - player 2 priority
-            emptyMap(),
-            // Turn 2 - player 1 priority
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    SpawnCreatureAction(fakeCreatureP1)
-                )
-            ),
-            // Turn 3 - player 2 priority
-            emptyMap(),
-            // Turn 4 - player 1 priority
-            mapOf(
-                Step.CombatPhaseDeclareAttackersStep to mutableListOf<Action>(
-                    DeclareAttackersAction(listOf(AttackAction(fakeCreatureP1, player2)))
+        scriptedActionBuilder
+            // Turn 0 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
+            // Turn 1 - player 2 active
+            .addTurn(Step.FirstMainPhaseStep, player2, PlayLandAction(Plains("plains-card-p2-a")))
+            // Turn 2 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, SpawnCreatureAction(fakeCreatureP1))
+            // Turn 3 - player 2 active
+            .addTurn(Step.FirstMainPhaseStep, player2, SpawnCreatureAction(fakeCreatureP2))
+            // Turn 4 - player 1 active
+            .addTurn(
+                mapOf(
+                    Step.CombatPhaseDeclareAttackersStep to listOf(
+                        Pair(
+                            player1,
+                            DeclareAttackersAction(listOf(AttackAction(fakeCreatureP1, player2)))
+                        )
+                    ),
+                    Step.CombatPhaseDeclareBlockersStep to listOf(
+                        Pair(
+                            player2,
+                            DeclareBlockersAction(listOf(BlockAction(fakeCreatureP1, listOf(fakeCreatureP2))))
+                        )
+                    )
                 )
             )
-        )
 
-        player2.scriptedActions = listOf(
-            // Turn 0 - player 1 priority
-            emptyMap(),
-            // Turn 1 - player 2 priority
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    PlayLandAction(Plains("plains-card-p2-a"))
-                )
-            ),
-            // Turn 2 - player 1 priority
-            emptyMap(),
-            // Turn 3 - player 2 priority
-            mapOf(
-                Step.FirstMainPhaseStep to mutableListOf<Action>(
-                    SpawnCreatureAction(fakeCreatureP2)
-                )
-            ),
-            // Turn 4 - player 1 priority
-            mapOf(
-                Step.CombatPhaseDeclareBlockersStep to mutableListOf<Action>(
-                    DeclareBlockersAction(listOf(BlockAction(fakeCreatureP1, listOf(fakeCreatureP2))))
-                )
-            )
-        )
+        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
+        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
 
         // When
         val gameLoop = instantiateGameLoop()

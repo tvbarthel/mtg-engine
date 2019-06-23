@@ -92,6 +92,71 @@ abstract class Player {
 
 }
 
+
+class ScriptedActionBuilder(private val player1: Player, private val player2: Player) {
+
+    private val player1Actions = mutableListOf<MutableMap<Step, MutableList<Action>>>()
+    private val player2Actions = mutableListOf<MutableMap<Step, MutableList<Action>>>()
+
+    fun addTurn(allScriptedActions: Map<Step, List<Pair<ScriptedPlayer, Action>>>): ScriptedActionBuilder {
+        val player1TurnActions = mutableMapOf<Step, MutableList<Action>>()
+        val player2TurnActions = mutableMapOf<Step, MutableList<Action>>()
+
+        allScriptedActions.forEach { (step, stepActions) ->
+            val player1StepActions = mutableListOf<Action>()
+            val player2StepActions = mutableListOf<Action>()
+
+            stepActions.forEach { pairedAction ->
+                val player = pairedAction.first
+                val action = pairedAction.second
+
+                when (player) {
+                    player1 -> player1StepActions.add(action)
+                    player2 -> player2StepActions.add(action)
+                    else -> throw IllegalArgumentException("Invalid player")
+                }
+            }
+
+            player1TurnActions[step] = player1StepActions
+            player2TurnActions[step] = player2StepActions
+        }
+
+        player1Actions.add(player1TurnActions)
+        player2Actions.add(player2TurnActions)
+
+        return this
+    }
+
+    /**
+     * Helper function to add a turn with no actions.
+     */
+    fun addTurn(): ScriptedActionBuilder {
+        return addTurn(emptyMap())
+    }
+
+    /**
+     * Helper function to add a turn with only one action.
+     */
+    fun addTurn(step: Step, player: ScriptedPlayer, action: Action): ScriptedActionBuilder {
+        return addTurn(
+            mapOf(
+                step to listOf(
+                    Pair(player, action)
+                )
+            )
+        )
+    }
+
+    fun getActions(player: Player): List<MutableMap<Step, MutableList<Action>>> {
+        return when (player) {
+            player1 -> player1Actions
+            player2 -> player2Actions
+            else -> throw IllegalArgumentException("Invalid player")
+        }
+    }
+
+}
+
 class ScriptedPlayer(private val name: String) : Player() {
 
     lateinit var scriptedActions: List<Map<Step, MutableList<Action>>>
