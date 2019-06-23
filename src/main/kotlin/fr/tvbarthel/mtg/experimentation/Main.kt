@@ -28,7 +28,7 @@ fun main() {
         // Turn 4 - player 1 priority
         mapOf(
             Step.FirstMainPhaseStep to mutableListOf<Action>(
-                SpawnCreatureAction(sanctuaryCatP1)
+                CastCreatureAction(sanctuaryCatP1)
             )
         ),
         // Turn 5 - player 2 priority
@@ -48,7 +48,7 @@ fun main() {
         mapOf(
             Step.FirstMainPhaseStep to mutableListOf<Action>(
                 PlayLandAction(Plains("plains-card-p2-a")),
-                SpawnCreatureAction(sanctuaryCatP2)
+                CastCreatureAction(sanctuaryCatP2)
             )
         ),
         // Turn 2 - player 1 priority

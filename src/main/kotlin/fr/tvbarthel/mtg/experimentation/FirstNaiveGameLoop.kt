@@ -69,8 +69,12 @@ class FirstNaiveGameLoop : GameLoop() {
             player.board.add(action.landCard)
         }
 
-        if (action is SpawnCreatureAction) {
+        if (action is CastCreatureAction) {
             player.board.add(action.creatureCard)
+        }
+
+        if (action is CastEnchantmentAction) {
+            player.board.add(action.enchantmentCard)
         }
     }
 

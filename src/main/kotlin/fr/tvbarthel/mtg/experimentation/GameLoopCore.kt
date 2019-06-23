@@ -46,9 +46,15 @@ class PlayLandAction(val landCard: LandCard) : Action {
     }
 }
 
-class SpawnCreatureAction(val creatureCard: CreatureCard) : Action {
+class CastCreatureAction(val creatureCard: CreatureCard) : Action {
     override fun toString(): String {
-        return "SpawnCreature Action $creatureCard"
+        return "CastCreature Action $creatureCard"
+    }
+}
+
+class CastEnchantmentAction(val enchantmentCard: EnchantmentCard) : Action {
+    override fun toString(): String {
+        return "CastEnchantment Action $enchantmentCard"
     }
 }
 
@@ -191,11 +197,9 @@ abstract class Card(val id: String) {
 }
 
 abstract class CreatureCard(id: String, val power: Int, val toughness: Int) : Card(id) {
-
     override fun toString(): String {
         return "CreatureCard{name: ${getName()}, power:$power, toughness:$toughness}"
     }
-
 }
 
 class SanctuaryCat(id: String) : CreatureCard(id, 1, 2) {
@@ -209,6 +213,12 @@ class FakeCreature(id: String, power: Int, toughness: Int) : CreatureCard(id, po
 abstract class LandCard(id: String) : Card(id)
 
 abstract class BasicLandCard(id: String) : LandCard(id)
+
+abstract class EnchantmentCard(id: String) : Card(id)
+
+class AjanisWelcome(id: String) : EnchantmentCard(id) {
+    override fun getName() = "Ajani's Welcome"
+}
 
 class Plains(id: String) : BasicLandCard(id) {
     override fun getName() = "Plains"
