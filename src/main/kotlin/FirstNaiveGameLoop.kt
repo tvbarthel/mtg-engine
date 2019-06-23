@@ -3,7 +3,8 @@ fun main() {
 
     val player1 = ScriptedPlayer("Ava")
     val player2 = ScriptedPlayer("Williams")
-    val sanctuaryCat = SanctuaryCat()
+    val sanctuaryCatP1 = SanctuaryCat("sanctuary-card-p1-a")
+    val sanctuaryCatP2 = SanctuaryCat("sanctuary-card-p2-a")
 
     player1.scriptedActions = listOf(
         // Turn 0 - player 1 priority
@@ -23,7 +24,19 @@ fun main() {
         // Turn 3 - player 2 priority
         emptyMap(),
         // Turn 4 - player 1 priority
-        emptyMap()
+        mapOf(
+            Step.FirstMainPhaseStep to mutableListOf<Action>(
+                SpawnCreatureAction(sanctuaryCatP1)
+            )
+        ),
+        // Turn 5 - player 2 priority
+        emptyMap(),
+        // Turn 6 - player 1 priority
+        mapOf(
+            Step.CombatPhaseDeclareAttackersStep to mutableListOf<Action>(
+                DeclareAttackersAction(listOf(AttackAction(sanctuaryCatP1, player2)))
+            )
+        )
     )
 
     player2.scriptedActions = listOf(
@@ -33,7 +46,7 @@ fun main() {
         mapOf(
             Step.FirstMainPhaseStep to mutableListOf<Action>(
                 PlayLandAction(),
-                SpawnCreatureAction(sanctuaryCat)
+                SpawnCreatureAction(sanctuaryCatP2)
             )
         ),
         // Turn 2 - player 1 priority
@@ -44,17 +57,25 @@ fun main() {
                 PlayLandAction()
             ),
             Step.CombatPhaseDeclareAttackersStep to mutableListOf<Action>(
-                DeclareAttackersAction(listOf(AttackAction(sanctuaryCat, player1)))
+                DeclareAttackersAction(listOf(AttackAction(sanctuaryCatP2, player1)))
             )
         ),
         // Turn 4 - player 1 priority
-        emptyMap()
+        emptyMap(),
+        // Turn 5 - player 2 priority
+        emptyMap(),
+        // Turn 6 - player 1 priority
+        mapOf(
+            Step.CombatPhaseDeclareBlockersStep to mutableListOf<Action>(
+                DeclareBlockersAction(listOf(BlockAction(sanctuaryCatP1, listOf(sanctuaryCatP2))))
+            )
+        )
     )
 
 
     val gameLoop = FirstNaiveGameLoop(player1, player2)
 
-    for (turn in 0..5) {
+    for (turn in 0..6) {
         gameLoop.playTurn(turn)
     }
 }
@@ -63,6 +84,7 @@ fun main() {
 class FirstNaiveGameLoop(private val player1: Player, private val player2: Player) {
 
     private val attackActions = mutableListOf<AttackAction>()
+    private val blockActions = mutableListOf<BlockAction>()
 
     fun playTurn(turn: Int) {
         playStep(turn, Step.BeginningPhaseUntapStep)
@@ -112,14 +134,28 @@ class FirstNaiveGameLoop(private val player1: Player, private val player2: Playe
         if (action is DeclareAttackersAction) {
             attackActions.addAll(action.attackActions)
         }
+
+        if (action is DeclareBlockersAction) {
+            blockActions.addAll(action.blockActions)
+        }
     }
 
     private fun handleStepStart(step: Step) {
         when (step) {
             Step.CombatPhaseDamageStep -> {
+                val blockerMap =
+                    blockActions.map { blockAction -> blockAction.blockedCreature.id to blockAction }.toMap()
+
                 for (attackAction in attackActions) {
-                    println("\t ${attackAction.creatureCard} deals ${attackAction.creatureCard.power} to ${attackAction.target}")
-                    attackAction.target.life -= attackAction.creatureCard.power
+                    val blockerAction = blockerMap[attackAction.creatureCard.id]
+
+                    if (blockerAction != null) {
+                        println("\t ${attackAction.creatureCard} blocked by ${blockerAction.blockingCreatures}")
+                        // TODO apply damages to creatures
+                    } else {
+                        println("\t ${attackAction.creatureCard} deals ${attackAction.creatureCard.power} to ${attackAction.target}")
+                        attackAction.target.life -= attackAction.creatureCard.power
+                    }
                 }
             }
             else -> {
@@ -133,6 +169,9 @@ class FirstNaiveGameLoop(private val player1: Player, private val player2: Playe
             Step.EndingPhaseCleanupStep -> {
                 println("\t cleaning attack actions")
                 attackActions.clear()
+
+                println("\t cleaning block actions")
+                blockActions.clear()
             }
             else -> {
             }
@@ -178,10 +217,24 @@ class DeclareAttackersAction(val attackActions: List<AttackAction>) : Action {
     }
 }
 
-class AttackAction(val creatureCard: CreatureCard, val target: Player) {
+class AttackAction(val creatureCard: CreatureCard, val target: Player) : Action {
     override fun toString(): String {
         return "Attack Action $creatureCard -> $target"
     }
+}
+
+class DeclareBlockersAction(val blockActions: List<BlockAction>) : Action {
+    override fun toString(): String {
+        return "DeclareBlockers Action $blockActions"
+    }
+}
+
+class BlockAction(val blockedCreature: CreatureCard, val blockingCreatures: List<CreatureCard>) : Action {
+
+    override fun toString(): String {
+        return "Block Action $blockedCreature blocked by $blockingCreatures"
+    }
+
 }
 
 abstract class Player {
@@ -221,11 +274,11 @@ class ScriptedPlayer(private val name: String) : Player() {
 
 }
 
-interface Card {
-    fun getName(): String
+abstract class Card(val id: String) {
+    abstract fun getName(): String
 }
 
-abstract class CreatureCard(val power: Int, val toughness: Int) : Card {
+abstract class CreatureCard(id: String, val power: Int, val toughness: Int) : Card(id) {
 
     override fun toString(): String {
         return "CreatureCard{name: ${getName()}, power:$power, toughness:$toughness}"
@@ -233,6 +286,6 @@ abstract class CreatureCard(val power: Int, val toughness: Int) : Card {
 
 }
 
-class SanctuaryCat : CreatureCard(1, 2) {
+class SanctuaryCat(id: String) : CreatureCard(id, 1, 2) {
     override fun getName() = "SanctuaryCat"
 }
