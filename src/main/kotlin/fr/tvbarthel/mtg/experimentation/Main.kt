@@ -75,9 +75,13 @@ fun main() {
     )
 
 
-    val gameLoop = FirstNaiveGameLoop(player1, player2)
+    val gameLoop = FirstNaiveGameLoop()
 
-    for (turn in 0..6) {
-        gameLoop.playTurn(turn)
-    }
+    gameLoop.playTurn(0, player1, player2)
+    gameLoop.playTurn(1, player2, player1)
+    gameLoop.playTurn(2, player1, player2)
+    gameLoop.playTurn(3, player2, player1)
+    gameLoop.playTurn(4, player1, player2)
+    gameLoop.playTurn(5, player2, player1)
+    gameLoop.playTurn(6, player1, player2)
 }

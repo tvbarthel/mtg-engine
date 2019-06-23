@@ -3,42 +3,42 @@ package fr.tvbarthel.mtg.experimentation
 /**
  * Very first game loop implementation: very naive approach that centralises all the logic into the game loop itself.
  */
-class FirstNaiveGameLoop(player1: Player, player2: Player) : GameLoop(player1, player2) {
+class FirstNaiveGameLoop : GameLoop() {
 
     private val attackActions = mutableListOf<AttackAction>()
     private val blockActions = mutableListOf<BlockAction>()
 
-    override fun playTurn(turn: Int) {
-        playStep(turn, Step.BeginningPhaseUntapStep)
-        playStep(turn, Step.BeginningPhaseUpKeepStep)
-        playStep(turn, Step.BeginningPhaseDrawStep)
+    override fun playTurn(turn: Int, activePlayer: Player, opponent: Player) {
+        playStep(turn, Step.BeginningPhaseUntapStep, activePlayer, opponent)
+        playStep(turn, Step.BeginningPhaseUpKeepStep, activePlayer, opponent)
+        playStep(turn, Step.BeginningPhaseDrawStep, activePlayer, opponent)
 
-        playStep(turn, Step.FirstMainPhaseStep)
+        playStep(turn, Step.FirstMainPhaseStep, activePlayer, opponent)
 
-        playStep(turn, Step.CombatPhaseBeginningStep)
-        playStep(turn, Step.CombatPhaseDeclareAttackersStep)
-        playStep(turn, Step.CombatPhaseDeclareBlockersStep)
-        playStep(turn, Step.CombatPhaseDamageStep)
-        playStep(turn, Step.CombatPhaseEndStep)
+        playStep(turn, Step.CombatPhaseBeginningStep, activePlayer, opponent)
+        playStep(turn, Step.CombatPhaseDeclareAttackersStep, activePlayer, opponent)
+        playStep(turn, Step.CombatPhaseDeclareBlockersStep, activePlayer, opponent)
+        playStep(turn, Step.CombatPhaseDamageStep, activePlayer, opponent)
+        playStep(turn, Step.CombatPhaseEndStep, activePlayer, opponent)
 
-        playStep(turn, Step.SecondMainPhaseStep)
+        playStep(turn, Step.SecondMainPhaseStep, activePlayer, opponent)
 
-        playStep(turn, Step.EndingPhaseEndStep)
-        playStep(turn, Step.EndingPhaseCleanupStep)
+        playStep(turn, Step.EndingPhaseEndStep, activePlayer, opponent)
+        playStep(turn, Step.EndingPhaseCleanupStep, activePlayer, opponent)
     }
 
-    private fun playStep(turn: Int, step: Step) {
+    private fun playStep(turn: Int, step: Step, activePlayer: Player, opponent: Player) {
         println("\nPlaying step for turn $turn $step ---->")
-        handleStepStart(step)
+        handleStepStart(step, activePlayer, opponent)
 
         while (true) {
-            val player1Action = player1.getAction(turn, step)
-            println("\t Player $player1 Action -> $player1Action")
-            handlePlayerAction(player1, player2, player1Action)
+            val player1Action = activePlayer.getAction(turn, step)
+            println("\t Player $activePlayer Action -> $player1Action")
+            handlePlayerAction(activePlayer, opponent, player1Action)
 
-            val player2Action = player2.getAction(turn, step)
-            println("\t Player $player2 Action -> $player2Action")
-            handlePlayerAction(player2, player1, player2Action)
+            val player2Action = opponent.getAction(turn, step)
+            println("\t Player $opponent Action -> $player2Action")
+            handlePlayerAction(opponent, activePlayer, player2Action)
 
             if (player1Action == null && player2Action == null) {
                 break
@@ -70,23 +70,10 @@ class FirstNaiveGameLoop(player1: Player, player2: Player) : GameLoop(player1, p
         }
     }
 
-    private fun handleStepStart(step: Step) {
+    private fun handleStepStart(step: Step, player: Player, opponent: Player) {
         when (step) {
             Step.CombatPhaseDamageStep -> {
-                val blockerMap =
-                    blockActions.map { blockAction -> blockAction.blockedCreature.id to blockAction }.toMap()
-
-                for (attackAction in attackActions) {
-                    val blockerAction = blockerMap[attackAction.creatureCard.id]
-
-                    if (blockerAction != null) {
-                        println("\t ${attackAction.creatureCard} blocked by ${blockerAction.blockingCreatures}")
-                        // TODO apply damages to creatures
-                    } else {
-                        println("\t ${attackAction.creatureCard} deals ${attackAction.creatureCard.power} to ${attackAction.target}")
-                        attackAction.target.life -= attackAction.creatureCard.power
-                    }
-                }
+                resolveCombatDamages(player, opponent)
             }
             else -> {
 
@@ -104,6 +91,50 @@ class FirstNaiveGameLoop(player1: Player, player2: Player) : GameLoop(player1, p
                 blockActions.clear()
             }
             else -> {
+            }
+        }
+    }
+
+    private fun resolveCombatDamages(player: Player, opponent: Player) {
+        val blockerMap =
+            blockActions.map { blockAction -> blockAction.blockedCreature.id to blockAction }.toMap()
+
+        for (attackAction in attackActions) {
+            val blockerAction = blockerMap[attackAction.creatureCard.id]
+
+            if (blockerAction != null) {
+                resolveBlockAction(blockerAction, player, opponent)
+            } else {
+                println("\t ${attackAction.creatureCard} deals ${attackAction.creatureCard.power} to ${attackAction.target}")
+                attackAction.target.life -= attackAction.creatureCard.power
+            }
+        }
+    }
+
+    private fun resolveBlockAction(blockAction: BlockAction, player: Player, opponent: Player) {
+        val blockedCreature = blockAction.blockedCreature
+        val blockingCreatures = blockAction.blockingCreatures.toMutableList()
+        println("\t $blockedCreature blocked by $blockingCreatures")
+
+        var remainingDamagesToDealToBlockingCreatures = blockedCreature.power
+        var damagesDealtToBlockedCreature = 0
+
+        while (remainingDamagesToDealToBlockingCreatures > 0 && blockingCreatures.isNotEmpty()) {
+            val blockingCreature = blockingCreatures.removeAt(0)
+            damagesDealtToBlockedCreature += blockingCreature.power
+            val damagesDealtToBlockingCreature =
+                Math.min(remainingDamagesToDealToBlockingCreatures, blockingCreature.toughness)
+            remainingDamagesToDealToBlockingCreatures -= damagesDealtToBlockingCreature
+
+            if (damagesDealtToBlockingCreature >= blockingCreature.toughness) {
+                opponent.board.remove(blockingCreature)
+                println("\t Blocking creature $blockingCreature dies.")
+            }
+
+            if (damagesDealtToBlockedCreature >= blockedCreature.toughness) {
+                player.board.remove(blockedCreature)
+                println("\t Blocked creature $blockedCreature dies.")
+                break
             }
         }
     }

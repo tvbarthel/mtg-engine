@@ -9,8 +9,8 @@ package fr.tvbarthel.mtg.experimentation
  * to determine the best strategies to adopt at a bigger scale.
  */
 
-abstract class GameLoop(val player1: Player, val player2: Player) {
-    abstract fun playTurn(turn: Int)
+abstract class GameLoop {
+    abstract fun playTurn(turn: Int, activePlayer: Player, opponent: Player)
 }
 
 enum class Step {
@@ -123,6 +123,10 @@ abstract class CreatureCard(id: String, val power: Int, val toughness: Int) : Ca
 
 class SanctuaryCat(id: String) : CreatureCard(id, 1, 2) {
     override fun getName() = "SanctuaryCat"
+}
+
+class FakeCreature(id: String, power: Int, toughness: Int) : CreatureCard(id, power, toughness) {
+    override fun getName() = "FakeCreaure"
 }
 
 abstract class LandCard(id: String) : Card(id)
