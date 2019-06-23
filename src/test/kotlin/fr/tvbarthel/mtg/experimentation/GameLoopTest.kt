@@ -34,9 +34,7 @@ class GameLoopTest : StringSpec({
 
         // When
         val gameLoop = instantiateGameLoop()
-        gameLoop.playTurn(0, player1, player2)
-        gameLoop.playTurn(1, player2, player1)
-        gameLoop.playTurn(2, player1, player2)
+        gameLoop.playTurns(player1, player2, 3)
 
         // Then
         player1.board.size shouldBe 2
@@ -82,11 +80,7 @@ class GameLoopTest : StringSpec({
 
         // When
         val gameLoop = instantiateGameLoop()
-        gameLoop.playTurn(0, player1, player2)
-        gameLoop.playTurn(1, player2, player1)
-        gameLoop.playTurn(2, player1, player2)
-        gameLoop.playTurn(3, player2, player1)
-        gameLoop.playTurn(4, player1, player2)
+        gameLoop.playTurns(player1, player2, 5)
 
         // Then
         player1.life shouldBe 20
@@ -155,11 +149,7 @@ class GameLoopTest : StringSpec({
 
         // When
         val gameLoop = instantiateGameLoop()
-        gameLoop.playTurn(0, player1, player2)
-        gameLoop.playTurn(1, player2, player1)
-        gameLoop.playTurn(2, player1, player2)
-        gameLoop.playTurn(3, player2, player1)
-        gameLoop.playTurn(4, player1, player2)
+        gameLoop.playTurns(player1, player2, 5)
 
         // Then
         player1.life shouldBe 20
@@ -230,11 +220,7 @@ class GameLoopTest : StringSpec({
 
         // When
         val gameLoop = instantiateGameLoop()
-        gameLoop.playTurn(0, player1, player2)
-        gameLoop.playTurn(1, player2, player1)
-        gameLoop.playTurn(2, player1, player2)
-        gameLoop.playTurn(3, player2, player1)
-        gameLoop.playTurn(4, player1, player2)
+        gameLoop.playTurns(player1, player2, 5)
 
         // Then
         player1.life shouldBe 20

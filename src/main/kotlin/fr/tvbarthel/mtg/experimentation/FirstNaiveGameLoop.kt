@@ -8,37 +8,41 @@ class FirstNaiveGameLoop : GameLoop() {
     private val attackActions = mutableListOf<AttackAction>()
     private val blockActions = mutableListOf<BlockAction>()
 
-    override fun playTurn(turn: Int, activePlayer: Player, opponent: Player) {
-        playStep(turn, Step.BeginningPhaseUntapStep, activePlayer, opponent)
-        playStep(turn, Step.BeginningPhaseUpKeepStep, activePlayer, opponent)
-        playStep(turn, Step.BeginningPhaseDrawStep, activePlayer, opponent)
+    override fun playTurn(turnContext: TurnContext) {
+        playStep(turnContext, Step.BeginningPhaseUntapStep)
+        playStep(turnContext, Step.BeginningPhaseUpKeepStep)
+        playStep(turnContext, Step.BeginningPhaseDrawStep)
 
-        playStep(turn, Step.FirstMainPhaseStep, activePlayer, opponent)
+        playStep(turnContext, Step.FirstMainPhaseStep)
 
-        playStep(turn, Step.CombatPhaseBeginningStep, activePlayer, opponent)
-        playStep(turn, Step.CombatPhaseDeclareAttackersStep, activePlayer, opponent)
-        playStep(turn, Step.CombatPhaseDeclareBlockersStep, activePlayer, opponent)
-        playStep(turn, Step.CombatPhaseDamageStep, activePlayer, opponent)
-        playStep(turn, Step.CombatPhaseEndStep, activePlayer, opponent)
+        playStep(turnContext, Step.CombatPhaseBeginningStep)
+        playStep(turnContext, Step.CombatPhaseDeclareAttackersStep)
+        playStep(turnContext, Step.CombatPhaseDeclareBlockersStep)
+        playStep(turnContext, Step.CombatPhaseDamageStep)
+        playStep(turnContext, Step.CombatPhaseEndStep)
 
-        playStep(turn, Step.SecondMainPhaseStep, activePlayer, opponent)
+        playStep(turnContext, Step.SecondMainPhaseStep)
 
-        playStep(turn, Step.EndingPhaseEndStep, activePlayer, opponent)
-        playStep(turn, Step.EndingPhaseCleanupStep, activePlayer, opponent)
+        playStep(turnContext, Step.EndingPhaseEndStep)
+        playStep(turnContext, Step.EndingPhaseCleanupStep)
     }
 
-    private fun playStep(turn: Int, step: Step, activePlayer: Player, opponent: Player) {
+    private fun playStep(turnContext: TurnContext, step: Step) {
+        val turn = turnContext.turnIndex
+        val activePlayer = turnContext.activePlayer
+        val opponentPlayer = turnContext.opponentPlayer
+
         println("\nPlaying step for turn $turn $step ---->")
-        handleStepStart(step, activePlayer, opponent)
+        handleStepStart(step, activePlayer, opponentPlayer)
 
         while (true) {
             val player1Action = activePlayer.getAction(turn, step)
             println("\t Player $activePlayer Action -> $player1Action")
-            handlePlayerAction(activePlayer, opponent, player1Action)
+            handlePlayerAction(activePlayer, opponentPlayer, player1Action)
 
-            val player2Action = opponent.getAction(turn, step)
-            println("\t Player $opponent Action -> $player2Action")
-            handlePlayerAction(opponent, activePlayer, player2Action)
+            val player2Action = opponentPlayer.getAction(turn, step)
+            println("\t Player $opponentPlayer Action -> $player2Action")
+            handlePlayerAction(opponentPlayer, activePlayer, player2Action)
 
             if (player1Action == null && player2Action == null) {
                 break

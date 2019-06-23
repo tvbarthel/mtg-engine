@@ -10,7 +10,17 @@ package fr.tvbarthel.mtg.experimentation
  */
 
 abstract class GameLoop {
-    abstract fun playTurn(turn: Int, activePlayer: Player, opponent: Player)
+    abstract fun playTurn(turnContext: TurnContext)
+
+    fun playTurns(player1: Player, player2: Player, nbTurn: Int) {
+        for (turnIndex in 0 until nbTurn) {
+            if (turnIndex % 2 == 0) {
+                playTurn(TurnContext(turnIndex, player1, player2))
+            } else {
+                playTurn(TurnContext(turnIndex, player2, player1))
+            }
+        }
+    }
 }
 
 enum class Step {
@@ -37,11 +47,9 @@ class PlayLandAction(val landCard: LandCard) : Action {
 }
 
 class SpawnCreatureAction(val creatureCard: CreatureCard) : Action {
-
     override fun toString(): String {
         return "SpawnCreature Action $creatureCard"
     }
-
 }
 
 class DeclareAttackersAction(val attackActions: List<AttackAction>) : Action {
@@ -63,12 +71,16 @@ class DeclareBlockersAction(val blockActions: List<BlockAction>) : Action {
 }
 
 class BlockAction(val blockedCreature: CreatureCard, val blockingCreatures: List<CreatureCard>) : Action {
-
     override fun toString(): String {
         return "Block Action $blockedCreature blocked by $blockingCreatures"
     }
-
 }
+
+class TurnContext(
+    val turnIndex: Int,
+    val activePlayer: Player,
+    val opponentPlayer: Player
+)
 
 abstract class Player {
 
