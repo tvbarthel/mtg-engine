@@ -1,5 +1,14 @@
 package fr.tvbarthel.mtg.experimentation
 
+/**
+ * This file is a collection of classes and interfaces meant to provide a flexible framework
+ * to quickly craft and test different game loop approaches.
+ *
+ * The goal is not to have a clean and ready-to-use game loop implementation, but rather to
+ * iterate quickly on different game loop implementations to see their advantages and disadvantages
+ * to determine the best strategies to adopt at a bigger scale.
+ */
+
 abstract class GameLoop(val player1: Player, val player2: Player) {
     abstract fun playTurn(turn: Int)
 }

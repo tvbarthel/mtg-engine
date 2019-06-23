@@ -1,5 +1,8 @@
 package fr.tvbarthel.mtg.experimentation
 
+/**
+ * Very first game loop implementation: very naive approach that centralises all the logic into the game loop itself.
+ */
 class FirstNaiveGameLoop(player1: Player, player2: Player) : GameLoop(player1, player2) {
 
     private val attackActions = mutableListOf<AttackAction>()
