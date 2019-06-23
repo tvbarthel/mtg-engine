@@ -129,24 +129,19 @@ class GameLoopTest : StringSpec({
         assert(player2.board[1] is SanctuaryCat)
     }
 
-    "Blocked creature dies" {
+    "Blocking creature dies" {
         // Given
         val player1 = ScriptedPlayer("Ava")
         val player2 = ScriptedPlayer("Williams")
         val fakeCreatureP1 = FakeCreature("fake-creature-p1", 4, 4)
         val fakeCreatureP2 = FakeCreature("fake-creature-p2", 1, 1)
-        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
 
+        player1.board.add(fakeCreatureP1)
+        player2.board.add(fakeCreatureP2)
+
+        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
         scriptedActionBuilder
             // Turn 0 - player 1 active
-            .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
-            // Turn 1 - player 2 active
-            .addTurn(Step.FirstMainPhaseStep, player2, PlayLandAction(Plains("plains-card-p2-a")))
-            // Turn 2 - player 1 active
-            .addTurn(Step.FirstMainPhaseStep, player1, SpawnCreatureAction(fakeCreatureP1))
-            // Turn 3 - player 2 active
-            .addTurn(Step.FirstMainPhaseStep, player2, SpawnCreatureAction(fakeCreatureP2))
-            // Turn 4 - player 1 active
             .addTurn(
                 mapOf(
                     Step.CombatPhaseDeclareAttackersStep to listOf(
@@ -169,16 +164,60 @@ class GameLoopTest : StringSpec({
 
         // When
         val gameLoop = instantiateGameLoop()
-        gameLoop.playTurns(player1, player2, 5)
+        gameLoop.playTurns(player1, player2, 1)
 
         // Then
         player1.life shouldBe 20
-        player1.board.size shouldBe 2
-        assert(player1.board[0] is Plains)
-        assert(player1.board[1] is FakeCreature)
+        player1.board.size shouldBe 1
+        player1.board[0] shouldBe fakeCreatureP1
+
+        player2.life shouldBe 20
+        player2.board.size shouldBe 0
+    }
+
+    "Blocked creatures dies" {
+        // Given
+        val player1 = ScriptedPlayer("Ava")
+        val player2 = ScriptedPlayer("Williams")
+        val fakeCreatureP1 = FakeCreature("fake-creature-p1", 1, 1)
+        val fakeCreatureP2 = FakeCreature("fake-creature-p2", 4, 4)
+
+        player1.board.add(fakeCreatureP1)
+        player2.board.add(fakeCreatureP2)
+
+        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
+        scriptedActionBuilder
+            // Turn 0 - player 1 active
+            .addTurn(
+                mapOf(
+                    Step.CombatPhaseDeclareAttackersStep to listOf(
+                        Pair(
+                            player1,
+                            DeclareAttackersAction(listOf(AttackAction(fakeCreatureP1, player2)))
+                        )
+                    ),
+                    Step.CombatPhaseDeclareBlockersStep to listOf(
+                        Pair(
+                            player2,
+                            DeclareBlockersAction(listOf(BlockAction(fakeCreatureP1, listOf(fakeCreatureP2))))
+                        )
+                    )
+                )
+            )
+
+        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
+        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
+
+        // When
+        val gameLoop = instantiateGameLoop()
+        gameLoop.playTurns(player1, player2, 1)
+
+        // Then
+        player1.life shouldBe 20
+        player1.board.size shouldBe 0
 
         player2.life shouldBe 20
         player2.board.size shouldBe 1
-        assert(player2.board[0] is Plains)
+        player2.board[0] shouldBe fakeCreatureP2
     }
 })
