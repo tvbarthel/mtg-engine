@@ -71,10 +71,20 @@ class FirstNaiveGameLoop : GameLoop() {
 
         if (action is CastCreatureAction) {
             player.board.add(action.creatureCard)
+            handleCreatureEnterBattlefield(action.creatureCard, player, opponent)
         }
 
         if (action is CastEnchantmentAction) {
             player.board.add(action.enchantmentCard)
+        }
+    }
+
+    private fun handleCreatureEnterBattlefield(creatureCard: CreatureCard, player: Player, opponent: Player) {
+        for (card in player.board) {
+            if (card is AjanisWelcome) {
+                player.life += 1
+                println("\t $card triggered! Player $player gained one life.")
+            }
         }
     }
 

@@ -214,7 +214,9 @@ abstract class LandCard(id: String) : Card(id)
 
 abstract class BasicLandCard(id: String) : LandCard(id)
 
-abstract class EnchantmentCard(id: String) : Card(id)
+abstract class EnchantmentCard(id: String) : Card(id) {
+    override fun toString() = "EnchantmentCard{name: ${getName()}}"
+}
 
 class AjanisWelcome(id: String) : EnchantmentCard(id) {
     override fun getName() = "Ajani's Welcome"
