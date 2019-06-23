@@ -10,7 +10,7 @@ fun main() {
         // Turn 0 - player 1 priority
         mapOf(
             Step.FirstMainPhaseStep to mutableListOf<Action>(
-                PlayLandAction()
+                PlayLandAction(Plains("plains-card-p1-a"))
             )
         ),
         // Turn 1 - player 2 priority
@@ -18,7 +18,7 @@ fun main() {
         // Turn 2 - player 1 priority
         mapOf(
             Step.FirstMainPhaseStep to mutableListOf<Action>(
-                PlayLandAction()
+                PlayLandAction(Plains("plains-card-p1-b"))
             )
         ),
         // Turn 3 - player 2 priority
@@ -45,7 +45,7 @@ fun main() {
         // Turn 1 - player 2 priority
         mapOf(
             Step.FirstMainPhaseStep to mutableListOf<Action>(
-                PlayLandAction(),
+                PlayLandAction(Plains("plains-card-p2-a")),
                 SpawnCreatureAction(sanctuaryCatP2)
             )
         ),
@@ -54,7 +54,7 @@ fun main() {
         // Turn 3 - player 2 priority
         mapOf(
             Step.FirstMainPhaseStep to mutableListOf<Action>(
-                PlayLandAction()
+                PlayLandAction(Plains("plains-card-p2-b"))
             ),
             Step.CombatPhaseDeclareAttackersStep to mutableListOf<Action>(
                 DeclareAttackersAction(listOf(AttackAction(sanctuaryCatP2, player1)))
@@ -138,6 +138,14 @@ class FirstNaiveGameLoop(private val player1: Player, private val player2: Playe
         if (action is DeclareBlockersAction) {
             blockActions.addAll(action.blockActions)
         }
+
+        if (action is PlayLandAction) {
+            player.board.add(action.landCard)
+        }
+
+        if (action is SpawnCreatureAction) {
+            player.board.add(action.creatureCard)
+        }
     }
 
     private fun handleStepStart(step: Step) {
@@ -197,7 +205,7 @@ enum class Step {
 
 interface Action
 
-class PlayLandAction : Action {
+class PlayLandAction(val landCard: LandCard) : Action {
     override fun toString(): String {
         return "PlayLand Action"
     }
@@ -240,6 +248,8 @@ class BlockAction(val blockedCreature: CreatureCard, val blockingCreatures: List
 abstract class Player {
 
     var life: Int = 20
+
+    var board: MutableList<Card> = mutableListOf()
 
     abstract fun getAction(turn: Int, step: Step): Action?
 
@@ -288,4 +298,12 @@ abstract class CreatureCard(id: String, val power: Int, val toughness: Int) : Ca
 
 class SanctuaryCat(id: String) : CreatureCard(id, 1, 2) {
     override fun getName() = "SanctuaryCat"
+}
+
+abstract class LandCard(id: String) : Card(id)
+
+abstract class BasicLandCard(id: String) : LandCard(id)
+
+class Plains(id: String) : BasicLandCard(id) {
+    override fun getName() = "Plains"
 }
