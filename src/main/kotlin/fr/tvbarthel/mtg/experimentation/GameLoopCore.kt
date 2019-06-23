@@ -101,6 +101,7 @@ abstract class Player {
 
 class ScriptedActionBuilder(private val player1: Player, private val player2: Player) {
 
+    private var nbTurns: Int = 0
     private val player1Actions = mutableListOf<MutableMap<Step, MutableList<Action>>>()
     private val player2Actions = mutableListOf<MutableMap<Step, MutableList<Action>>>()
 
@@ -129,6 +130,7 @@ class ScriptedActionBuilder(private val player1: Player, private val player2: Pl
 
         player1Actions.add(player1TurnActions)
         player2Actions.add(player2TurnActions)
+        nbTurns += 1
 
         return this
     }
@@ -159,6 +161,12 @@ class ScriptedActionBuilder(private val player1: Player, private val player2: Pl
             player2 -> player2Actions
             else -> throw IllegalArgumentException("Invalid player")
         }
+    }
+
+    fun playTurns(gameLoop: GameLoop, player1: ScriptedPlayer, player2: ScriptedPlayer) {
+        player1.scriptedActions = getActions(player1)
+        player2.scriptedActions = getActions(player2)
+        gameLoop.playTurns(player1, player2, nbTurns)
     }
 
 }

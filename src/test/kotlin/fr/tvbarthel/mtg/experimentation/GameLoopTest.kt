@@ -12,23 +12,17 @@ class GameLoopTest : StringSpec({
         // Given
         val player1 = ScriptedPlayer("Ava")
         val player2 = ScriptedPlayer("Williams")
-        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
 
-        scriptedActionBuilder
+        // When
+        ScriptedActionBuilder(player1, player2)
             // Turn 0 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
             // Turn 1 - player 2 active
             .addTurn()
             // Turn 2 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-b")))
-
-
-        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
-        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
-
-        // When
-        val gameLoop = instantiateGameLoop()
-        gameLoop.playTurns(player1, player2, 3)
+            // Play
+            .playTurns(instantiateGameLoop(), player1, player2)
 
         // Then
         player1.board.size shouldBe 2
@@ -44,9 +38,9 @@ class GameLoopTest : StringSpec({
         val player1 = ScriptedPlayer("Ava")
         val player2 = ScriptedPlayer("Williams")
         val sanctuaryCat = SanctuaryCat("sanctuary-cat-1")
-        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
 
-        scriptedActionBuilder
+        // When
+        ScriptedActionBuilder(player1, player2)
             // Turn 0 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
             // Turn 1 - player 2 active
@@ -61,13 +55,8 @@ class GameLoopTest : StringSpec({
                 player1,
                 DeclareAttackersAction(listOf(AttackAction(sanctuaryCat, player2)))
             )
-
-        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
-        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
-
-        // When
-        val gameLoop = instantiateGameLoop()
-        gameLoop.playTurns(player1, player2, 5)
+            // Play
+            .playTurns(instantiateGameLoop(), player1, player2)
 
         // Then
         player1.life shouldBe 20
@@ -83,9 +72,9 @@ class GameLoopTest : StringSpec({
         val player2 = ScriptedPlayer("Williams")
         val sanctuaryCatP1 = SanctuaryCat("sanctuary-cat-p1")
         val sanctuaryCatP2 = SanctuaryCat("sanctuary-cat-p2")
-        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
 
-        scriptedActionBuilder
+        // When
+        ScriptedActionBuilder(player1, player2)
             // Turn 0 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
             // Turn 1 - player 2 active
@@ -111,13 +100,8 @@ class GameLoopTest : StringSpec({
                     )
                 )
             )
-
-        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
-        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
-
-        // When
-        val gameLoop = instantiateGameLoop()
-        gameLoop.playTurns(player1, player2, 5)
+            // Play
+            .playTurns(instantiateGameLoop(), player1, player2)
 
         // Then
         player1.life shouldBe 20
@@ -139,8 +123,8 @@ class GameLoopTest : StringSpec({
         player1.board.add(fakeCreatureP1)
         player2.board.add(fakeCreatureP2)
 
-        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
-        scriptedActionBuilder
+        // When
+        ScriptedActionBuilder(player1, player2)
             // Turn 0 - player 1 active
             .addTurn(
                 mapOf(
@@ -158,13 +142,8 @@ class GameLoopTest : StringSpec({
                     )
                 )
             )
-
-        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
-        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
-
-        // When
-        val gameLoop = instantiateGameLoop()
-        gameLoop.playTurns(player1, player2, 1)
+            // Play
+            .playTurns(instantiateGameLoop(), player1, player2)
 
         // Then
         player1.life shouldBe 20
@@ -185,8 +164,8 @@ class GameLoopTest : StringSpec({
         player1.board.add(fakeCreatureP1)
         player2.board.add(fakeCreatureP2)
 
-        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
-        scriptedActionBuilder
+        // When
+        ScriptedActionBuilder(player1, player2)
             // Turn 0 - player 1 active
             .addTurn(
                 mapOf(
@@ -204,13 +183,8 @@ class GameLoopTest : StringSpec({
                     )
                 )
             )
-
-        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
-        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
-
-        // When
-        val gameLoop = instantiateGameLoop()
-        gameLoop.playTurns(player1, player2, 1)
+            // Play
+            .playTurns(instantiateGameLoop(), player1, player2)
 
         // Then
         player1.life shouldBe 20
@@ -226,19 +200,13 @@ class GameLoopTest : StringSpec({
         val player1 = ScriptedPlayer("Ava")
         val player2 = ScriptedPlayer("Williams")
         val ajanisWelcome = AjanisWelcome("card-1")
-        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
-
-        scriptedActionBuilder
-            // Turn 0 - player 1 active
-            .addTurn(Step.FirstMainPhaseStep, player1, CastEnchantmentAction(ajanisWelcome))
-
-
-        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
-        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
 
         // When
-        val gameLoop = instantiateGameLoop()
-        gameLoop.playTurns(player1, player2, 1)
+        ScriptedActionBuilder(player1, player2)
+            // Turn 0 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, CastEnchantmentAction(ajanisWelcome))
+            // Play
+            .playTurns(instantiateGameLoop(), player1, player2)
 
         // Then
         player1.board.size shouldBe 1
@@ -253,23 +221,17 @@ class GameLoopTest : StringSpec({
         val player2 = ScriptedPlayer("Williams")
         val ajanisWelcome = AjanisWelcome("card-1")
         val sanctuaryCat = SanctuaryCat("card-2")
-        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
 
-        scriptedActionBuilder
+        // When
+        ScriptedActionBuilder(player1, player2)
             // Turn 0 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, CastEnchantmentAction(ajanisWelcome))
             // Turn 1 - player 2 active
             .addTurn()
             // Turn 2 - player 1 active
             .addTurn(Step.SecondMainPhaseStep, player1, CastCreatureAction(sanctuaryCat))
-
-
-        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
-        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
-
-        // When
-        val gameLoop = instantiateGameLoop()
-        gameLoop.playTurns(player1, player2, 3)
+            // Play
+            .playTurns(instantiateGameLoop(), player1, player2)
 
         // Then
         player1.life shouldBe 21
@@ -284,20 +246,15 @@ class GameLoopTest : StringSpec({
         val player2 = ScriptedPlayer("Williams")
         val sanctuaryCat = SanctuaryCat("card-1")
         val benalishMarshal = BenalishMarshal("card-2")
-        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
 
         player1.board.add(sanctuaryCat)
 
-        scriptedActionBuilder
+        // When
+        ScriptedActionBuilder(player1, player2)
             // Turn 0 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, CastCreatureAction(benalishMarshal))
-
-        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
-        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
-
-        // When
-        val gameLoop = instantiateGameLoop()
-        gameLoop.playTurns(player1, player2, 1)
+            // Play
+            .playTurns(instantiateGameLoop(), player1, player2)
 
         // Then
         player1.board.size shouldBe 2
@@ -314,12 +271,12 @@ class GameLoopTest : StringSpec({
         val sanctuaryCat = SanctuaryCat("card-1")
         val benalishMarshal = BenalishMarshal("card-2")
         val fakeCreature = FakeCreature("card-3", 99, 99)
-        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
 
         player1.board.add(sanctuaryCat)
         player2.board.add(fakeCreature)
 
-        scriptedActionBuilder
+        // When
+        ScriptedActionBuilder(player1, player2)
             // Turn 0 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, CastCreatureAction(benalishMarshal))
             // Turn 1 - player 2 active
@@ -333,13 +290,8 @@ class GameLoopTest : StringSpec({
                     )
                 )
             )
-
-        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
-        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
-
-        // When
-        val gameLoop = instantiateGameLoop()
-        gameLoop.playTurns(player1, player2, 2)
+            // Play
+            .playTurns(instantiateGameLoop(), player1, player2)
 
         // Then
         player1.board.size shouldBe 1
