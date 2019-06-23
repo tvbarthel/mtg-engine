@@ -1,5 +1,6 @@
 package fr.tvbarthel.mtg.engine.playing.phase
 
+import fr.tvbarthel.mtg.engine.Agent
 import fr.tvbarthel.mtg.engine.GameState
 import fr.tvbarthel.mtg.engine.Phase
 import fr.tvbarthel.mtg.engine.playing.step.CleanupStep
@@ -19,8 +20,8 @@ class EndingPhase(
     private val endStep: EndStep = EndStep(),
     private val cleanupStep: CleanupStep = CleanupStep()
 ) : Phase {
-    override fun proceed(gameState: GameState): GameState {
-        val intermediateState = endStep.proceed(gameState)
-        return cleanupStep.proceed(intermediateState)
+    override fun proceed(agents: Map<Int, Agent>, state: GameState): GameState {
+        val intermediateState = endStep.proceed(agents, state)
+        return cleanupStep.proceed(agents, intermediateState)
     }
 }

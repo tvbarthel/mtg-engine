@@ -1,5 +1,6 @@
 package fr.tvbarthel.mtg.engine.playing.phase
 
+import fr.tvbarthel.mtg.engine.Agent
 import fr.tvbarthel.mtg.engine.GameState
 import fr.tvbarthel.mtg.engine.playing.step.DrawStep
 import fr.tvbarthel.mtg.engine.playing.step.UntapStep
@@ -23,6 +24,9 @@ class BeginningPhaseTest : StringSpec() {
     @RelaxedMockK
     lateinit var drawStep: DrawStep
 
+    @RelaxedMockK
+    lateinit var agents: Map<Int, Agent>
+
     init {
         MockKAnnotations.init(this)
 
@@ -31,13 +35,13 @@ class BeginningPhaseTest : StringSpec() {
             val state = GameState(1234718L)
 
             // when
-            BeginningPhase(untapStep, upkeepStep, drawStep).proceed(state)
+            BeginningPhase(untapStep, upkeepStep, drawStep).proceed(agents, state)
 
             // then
             verifyOrder {
-                untapStep.proceed(any())
-                upkeepStep.proceed(any())
-                drawStep.proceed(any())
+                untapStep.proceed(eq(agents), any())
+                upkeepStep.proceed(eq(agents), any())
+                drawStep.proceed(eq(agents), any())
             }
         }
     }

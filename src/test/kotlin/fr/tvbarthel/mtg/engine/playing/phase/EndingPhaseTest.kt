@@ -1,5 +1,6 @@
 package fr.tvbarthel.mtg.engine.playing.phase
 
+import fr.tvbarthel.mtg.engine.Agent
 import fr.tvbarthel.mtg.engine.GameState
 import fr.tvbarthel.mtg.engine.playing.step.CleanupStep
 import fr.tvbarthel.mtg.engine.playing.step.EndStep
@@ -19,6 +20,9 @@ class EndingPhaseTest : StringSpec() {
     @RelaxedMockK
     lateinit var cleanupStep: CleanupStep
 
+    @RelaxedMockK
+    lateinit var agents: Map<Int, Agent>
+
     init {
         MockKAnnotations.init(this)
 
@@ -27,12 +31,12 @@ class EndingPhaseTest : StringSpec() {
             val state = GameState(1234789L)
 
             // when
-            EndingPhase(endStep, cleanupStep).proceed(state)
+            EndingPhase(endStep, cleanupStep).proceed(agents, state)
 
             // then
             verifyOrder {
-                endStep.proceed(any())
-                cleanupStep.proceed(any())
+                endStep.proceed(eq(agents), any())
+                cleanupStep.proceed(eq(agents), any())
             }
         }
     }

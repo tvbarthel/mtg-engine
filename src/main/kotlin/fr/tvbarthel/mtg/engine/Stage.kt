@@ -3,11 +3,11 @@ package fr.tvbarthel.mtg.engine
 /**
  * Encapsulate highest "step" of the game engine.
  */
-interface Stage<in I, out O> {
+interface Stage {
 
     /**
      * Must proceed the given stage.
      */
-    fun proceed(input: I): O
+    fun proceed(agents: Map<Int, Agent>, state: GameState): GameState
 
 }

@@ -19,6 +19,10 @@ interface Phase {
      * Must proceed to the given step.
      *
      * i.e. based on the current state, apply change and output the resulting state.
+     *
+     * @param agents list of decision maker agent mapped by player ids.
+     * @param state state from which the phase must start.
+     * @return new state once the phase a finished.
      */
-    fun proceed(gameState: GameState): GameState
+    fun proceed(agents: Map<Int, Agent>, state: GameState): GameState
 }

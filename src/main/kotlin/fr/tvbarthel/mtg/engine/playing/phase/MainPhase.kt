@@ -1,5 +1,6 @@
 package fr.tvbarthel.mtg.engine.playing.phase
 
+import fr.tvbarthel.mtg.engine.Agent
 import fr.tvbarthel.mtg.engine.GameState
 import fr.tvbarthel.mtg.engine.Phase
 
@@ -23,7 +24,7 @@ import fr.tvbarthel.mtg.engine.Phase
  * https://mtg.gamepedia.com/Main_phase
  */
 class MainPhase : Phase {
-    override fun proceed(gameState: GameState): GameState {
-        return gameState
+    override fun proceed(agents: Map<Int, Agent>, state: GameState): GameState {
+        return state
     }
 }

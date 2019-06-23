@@ -1,5 +1,6 @@
 package fr.tvbarthel.mtg.engine.playing
 
+import fr.tvbarthel.mtg.engine.Agent
 import fr.tvbarthel.mtg.engine.GameState
 import fr.tvbarthel.mtg.engine.playing.phase.BeginningPhase
 import fr.tvbarthel.mtg.engine.playing.phase.CombatPhase
@@ -21,11 +22,11 @@ class Turn(
     /**
      * Play the given turn.
      */
-    fun play(gameState: GameState): GameState {
-        var intermediateState = beginningPhase.proceed(gameState)
-        intermediateState = mainPhase.proceed(intermediateState)
-        intermediateState = combatPhase.proceed(intermediateState)
-        intermediateState = mainPhase.proceed(intermediateState)
-        return endingPhase.proceed(intermediateState)
+    fun play(agents: Map<Int, Agent>, state: GameState): GameState {
+        var intermediateState = beginningPhase.proceed(agents, state)
+        intermediateState = mainPhase.proceed(agents, intermediateState)
+        intermediateState = combatPhase.proceed(agents, intermediateState)
+        intermediateState = mainPhase.proceed(agents, intermediateState)
+        return endingPhase.proceed(agents, intermediateState)
     }
 }

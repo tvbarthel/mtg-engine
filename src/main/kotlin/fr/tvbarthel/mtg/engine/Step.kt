@@ -10,5 +10,5 @@ interface Step {
      *
      * i.e. based on the current state, apply change and output the resulting state.
      */
-    fun proceed(gameState: GameState): GameState
+    fun proceed(agents: Map<Int, Agent>, state: GameState): GameState
 }
