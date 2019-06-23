@@ -192,18 +192,62 @@ class ScriptedPlayer(private val name: String) : Player() {
 
 }
 
+class Modifier(val owner: Card, val value: Int)
+
 abstract class Card(val id: String) {
     abstract fun getName(): String
 }
 
-abstract class CreatureCard(id: String, val power: Int, val toughness: Int) : Card(id) {
+abstract class CreatureCard(id: String, private val initialPower: Int, private val initialToughness: Int) : Card(id) {
+
+    private var currentPower = initialPower
+    private var currentToughness = initialToughness
+    private val powerModifiers = mutableListOf<Modifier>()
+    private val toughnessModifiers = mutableListOf<Modifier>()
+
     override fun toString(): String {
-        return "CreatureCard{name: ${getName()}, power:$power, toughness:$toughness}"
+        return "CreatureCard{name: ${getName()}, initialPower:$initialPower, initialToughness:$initialToughness}"
+    }
+
+    fun getCurrentPower(): Int {
+        return currentPower
+    }
+
+    fun getCurrentToughness(): Int {
+        return currentToughness
+    }
+
+    fun addPowerModifier(powerModifier: Modifier) {
+        powerModifiers.add(powerModifier)
+        currentPower += powerModifier.value
+    }
+
+    fun addToughnessModifier(toughnessModifier: Modifier) {
+        toughnessModifiers.add(toughnessModifier)
+        currentToughness += toughnessModifier.value
+    }
+
+    fun removePowerModifiers(owner: Card) {
+        powerModifiers.removeAll { modifier ->
+            currentPower -= modifier.value
+            modifier.owner == owner
+        }
+    }
+
+    fun removeToughnessModifiers(owner: Card) {
+        toughnessModifiers.removeAll { modifier ->
+            currentToughness -= modifier.value
+            modifier.owner == owner
+        }
     }
 }
 
 class SanctuaryCat(id: String) : CreatureCard(id, 1, 2) {
     override fun getName() = "SanctuaryCat"
+}
+
+class BenalishMarshal(id: String) : CreatureCard(id, 3, 3) {
+    override fun getName() = "Benalish Marshal"
 }
 
 class FakeCreature(id: String, power: Int, toughness: Int) : CreatureCard(id, power, toughness) {

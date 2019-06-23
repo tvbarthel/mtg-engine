@@ -277,4 +277,77 @@ class GameLoopTest : StringSpec({
         player1.board[0] shouldBe ajanisWelcome
         player1.board[1] shouldBe sanctuaryCat
     }
+
+    "Benalish Marshal boost existing creatures" {
+        // Given
+        val player1 = ScriptedPlayer("Ava")
+        val player2 = ScriptedPlayer("Williams")
+        val sanctuaryCat = SanctuaryCat("card-1")
+        val benalishMarshal = BenalishMarshal("card-2")
+        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
+
+        player1.board.add(sanctuaryCat)
+
+        scriptedActionBuilder
+            // Turn 0 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, CastCreatureAction(benalishMarshal))
+
+        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
+        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
+
+        // When
+        val gameLoop = instantiateGameLoop()
+        gameLoop.playTurns(player1, player2, 1)
+
+        // Then
+        player1.board.size shouldBe 2
+        player1.board[0] shouldBe sanctuaryCat
+        assert((player1.board[0] as CreatureCard).getCurrentPower() == 2)
+        assert((player1.board[0] as CreatureCard).getCurrentToughness() == 3)
+        player1.board[1] shouldBe benalishMarshal
+    }
+
+    "Benalish Marshal stop boosting creatures if it dies" {
+        // Given
+        val player1 = ScriptedPlayer("Ava")
+        val player2 = ScriptedPlayer("Williams")
+        val sanctuaryCat = SanctuaryCat("card-1")
+        val benalishMarshal = BenalishMarshal("card-2")
+        val fakeCreature = FakeCreature("card-3", 99, 99)
+        val scriptedActionBuilder = ScriptedActionBuilder(player1, player2)
+
+        player1.board.add(sanctuaryCat)
+        player2.board.add(fakeCreature)
+
+        scriptedActionBuilder
+            // Turn 0 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, CastCreatureAction(benalishMarshal))
+            // Turn 1 - player 2 active
+            .addTurn(
+                mapOf(
+                    Step.CombatPhaseDeclareAttackersStep to listOf(
+                        Pair(player2, DeclareAttackersAction(listOf(AttackAction(fakeCreature, player1))))
+                    ),
+                    Step.CombatPhaseDeclareBlockersStep to listOf(
+                        Pair(player1, DeclareBlockersAction(listOf(BlockAction(fakeCreature, listOf(benalishMarshal)))))
+                    )
+                )
+            )
+
+        player1.scriptedActions = scriptedActionBuilder.getActions(player1)
+        player2.scriptedActions = scriptedActionBuilder.getActions(player2)
+
+        // When
+        val gameLoop = instantiateGameLoop()
+        gameLoop.playTurns(player1, player2, 2)
+
+        // Then
+        player1.board.size shouldBe 1
+        player1.board[0] shouldBe sanctuaryCat
+        assert((player1.board[0] as CreatureCard).getCurrentPower() == 1)
+        assert((player1.board[0] as CreatureCard).getCurrentToughness() == 2)
+
+        player2.board.size shouldBe 1
+        player2.board[0] shouldBe fakeCreature
+    }
 })
