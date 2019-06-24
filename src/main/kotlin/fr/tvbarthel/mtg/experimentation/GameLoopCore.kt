@@ -7,6 +7,8 @@ package fr.tvbarthel.mtg.experimentation
  * The goal is not to have a clean and ready-to-use game loop implementation, but rather to
  * iterate quickly on different game loop implementations to see their advantages and disadvantages
  * to determine the best strategies to adopt at a bigger scale.
+ *
+ * Note: in those experiments, a game loop is not responsible of verifying if actions are valid or not.
  */
 
 abstract class GameLoop {
