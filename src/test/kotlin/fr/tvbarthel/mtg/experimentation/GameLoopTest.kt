@@ -53,7 +53,7 @@ class GameLoopTest : StringSpec({
             .addTurn(
                 Step.CombatPhaseDeclareAttackersStep,
                 player1,
-                DeclareAttackersAction(listOf(AttackAction(sanctuaryCat, player2)))
+                DeclareAttackersAction(sanctuaryCat, player2)
             )
             // Play
             .playTurns(instantiateGameLoop(), player1, player2)
@@ -87,16 +87,10 @@ class GameLoopTest : StringSpec({
             .addTurn(
                 mapOf(
                     Step.CombatPhaseDeclareAttackersStep to listOf(
-                        Pair(
-                            player1,
-                            DeclareAttackersAction(listOf(AttackAction(sanctuaryCatP1, player2)))
-                        )
+                        Pair(player1, DeclareAttackersAction(sanctuaryCatP1, player2))
                     ),
                     Step.CombatPhaseDeclareBlockersStep to listOf(
-                        Pair(
-                            player2,
-                            DeclareBlockersAction(listOf(BlockAction(sanctuaryCatP1, listOf(sanctuaryCatP2))))
-                        )
+                        Pair(player2, DeclareBlockersAction(sanctuaryCatP1, sanctuaryCatP2))
                     )
                 )
             )
@@ -129,16 +123,10 @@ class GameLoopTest : StringSpec({
             .addTurn(
                 mapOf(
                     Step.CombatPhaseDeclareAttackersStep to listOf(
-                        Pair(
-                            player1,
-                            DeclareAttackersAction(listOf(AttackAction(fakeCreatureP1, player2)))
-                        )
+                        Pair(player1, DeclareAttackersAction(fakeCreatureP1, player2))
                     ),
                     Step.CombatPhaseDeclareBlockersStep to listOf(
-                        Pair(
-                            player2,
-                            DeclareBlockersAction(listOf(BlockAction(fakeCreatureP1, listOf(fakeCreatureP2))))
-                        )
+                        Pair(player2, DeclareBlockersAction(fakeCreatureP1, fakeCreatureP2))
                     )
                 )
             )
@@ -170,16 +158,10 @@ class GameLoopTest : StringSpec({
             .addTurn(
                 mapOf(
                     Step.CombatPhaseDeclareAttackersStep to listOf(
-                        Pair(
-                            player1,
-                            DeclareAttackersAction(listOf(AttackAction(fakeCreatureP1, player2)))
-                        )
+                        Pair(player1, DeclareAttackersAction(fakeCreatureP1, player2))
                     ),
                     Step.CombatPhaseDeclareBlockersStep to listOf(
-                        Pair(
-                            player2,
-                            DeclareBlockersAction(listOf(BlockAction(fakeCreatureP1, listOf(fakeCreatureP2))))
-                        )
+                        Pair(player2, DeclareBlockersAction(fakeCreatureP1, fakeCreatureP2))
                     )
                 )
             )
@@ -283,10 +265,10 @@ class GameLoopTest : StringSpec({
             .addTurn(
                 mapOf(
                     Step.CombatPhaseDeclareAttackersStep to listOf(
-                        Pair(player2, DeclareAttackersAction(listOf(AttackAction(fakeCreature, player1))))
+                        Pair(player2, DeclareAttackersAction(fakeCreature, player1))
                     ),
                     Step.CombatPhaseDeclareBlockersStep to listOf(
-                        Pair(player1, DeclareBlockersAction(listOf(BlockAction(fakeCreature, listOf(benalishMarshal)))))
+                        Pair(player1, DeclareBlockersAction(fakeCreature, benalishMarshal))
                     )
                 )
             )

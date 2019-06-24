@@ -59,6 +59,11 @@ class CastEnchantmentAction(val enchantmentCard: EnchantmentCard) : Action {
 }
 
 class DeclareAttackersAction(val attackActions: List<AttackAction>) : Action {
+
+    constructor(creatureCard: CreatureCard, target: Player) : this(AttackAction(creatureCard, target))
+
+    constructor(attackAction: AttackAction) : this(listOf(attackAction))
+
     override fun toString(): String {
         return "DeclareAttackers Action $attackActions"
     }
@@ -71,6 +76,16 @@ class AttackAction(val creatureCard: CreatureCard, val target: Player) : Action 
 }
 
 class DeclareBlockersAction(val blockActions: List<BlockAction>) : Action {
+
+    constructor(blockedCreature: CreatureCard, blockingCreature: CreatureCard) : this(
+        BlockAction(
+            blockedCreature,
+            listOf(blockingCreature)
+        )
+    )
+
+    constructor(blockAction: BlockAction) : this(listOf(blockAction))
+
     override fun toString(): String {
         return "DeclareBlockers Action $blockActions"
     }
