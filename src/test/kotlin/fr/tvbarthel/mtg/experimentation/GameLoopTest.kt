@@ -241,8 +241,8 @@ class GameLoopTest : StringSpec({
         // Then
         player1.board.size shouldBe 2
         player1.board[0] shouldBe sanctuaryCat
-        assert((player1.board[0] as CreatureCard).getCurrentPower() == 2)
-        assert((player1.board[0] as CreatureCard).getCurrentToughness() == 3)
+        assert((player1.board[0] as CreatureCard).power.getCurrentValue() == 2)
+        assert((player1.board[0] as CreatureCard).toughness.getCurrentValue() == 3)
         player1.board[1] shouldBe benalishMarshal
     }
 
@@ -278,8 +278,8 @@ class GameLoopTest : StringSpec({
         // Then
         player1.board.size shouldBe 1
         player1.board[0] shouldBe sanctuaryCat
-        assert((player1.board[0] as CreatureCard).getCurrentPower() == 1)
-        assert((player1.board[0] as CreatureCard).getCurrentToughness() == 2)
+        assert((player1.board[0] as CreatureCard).power.getCurrentValue() == 1)
+        assert((player1.board[0] as CreatureCard).toughness.getCurrentValue() == 2)
 
         player2.board.size shouldBe 1
         player2.board[0] shouldBe fakeCreature

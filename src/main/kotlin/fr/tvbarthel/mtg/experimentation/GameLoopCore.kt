@@ -217,7 +217,36 @@ class ScriptedPlayer(private val name: String) : Player() {
 
 }
 
-class Modifier(val owner: Card, val value: Int)
+class ModifiableIntValue(private val initialValue: Int) {
+
+    private var currentValue = initialValue
+    private val modifiers = mutableListOf<IntValueModifier>()
+
+    fun getCurrentValue(): Int {
+        return currentValue
+    }
+
+    fun addModifier(owner: Any, amount: Int) {
+        addModifier(IntValueModifier(owner, amount))
+    }
+
+    fun addModifier(modifier: IntValueModifier) {
+        currentValue += modifier.amount
+        modifiers.add(modifier)
+    }
+
+    fun removeModifiers(owner: Any) {
+        val modifiersToRemove = modifiers.filter { modifier -> modifier.owner == owner }
+
+        for (modifierToRemove in modifiersToRemove) {
+            currentValue -= modifierToRemove.amount
+            modifiers.remove(modifierToRemove)
+        }
+    }
+
+}
+
+class IntValueModifier(val owner: Any, val amount: Int)
 
 abstract class Card(val id: String) {
     abstract fun getName(): String
@@ -225,45 +254,11 @@ abstract class Card(val id: String) {
 
 abstract class CreatureCard(id: String, private val initialPower: Int, private val initialToughness: Int) : Card(id) {
 
-    private var currentPower = initialPower
-    private var currentToughness = initialToughness
-    private val powerModifiers = mutableListOf<Modifier>()
-    private val toughnessModifiers = mutableListOf<Modifier>()
+    val power = ModifiableIntValue(initialPower)
+    val toughness = ModifiableIntValue(initialToughness)
 
     override fun toString(): String {
         return "CreatureCard{name: ${getName()}, initialPower:$initialPower, initialToughness:$initialToughness}"
-    }
-
-    fun getCurrentPower(): Int {
-        return currentPower
-    }
-
-    fun getCurrentToughness(): Int {
-        return currentToughness
-    }
-
-    fun addPowerModifier(powerModifier: Modifier) {
-        powerModifiers.add(powerModifier)
-        currentPower += powerModifier.value
-    }
-
-    fun addToughnessModifier(toughnessModifier: Modifier) {
-        toughnessModifiers.add(toughnessModifier)
-        currentToughness += toughnessModifier.value
-    }
-
-    fun removePowerModifiers(owner: Card) {
-        powerModifiers.removeAll { modifier ->
-            currentPower -= modifier.value
-            modifier.owner == owner
-        }
-    }
-
-    fun removeToughnessModifiers(owner: Card) {
-        toughnessModifiers.removeAll { modifier ->
-            currentToughness -= modifier.value
-            modifier.owner == owner
-        }
     }
 }
 

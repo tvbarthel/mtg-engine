@@ -91,14 +91,14 @@ class FirstNaiveGameLoop : GameLoop() {
             }
 
             if (card is BenalishMarshal) {
-                creatureEnteringBattlefield.addPowerModifier(Modifier(card, 1))
-                creatureEnteringBattlefield.addToughnessModifier(Modifier(card, 1))
+                creatureEnteringBattlefield.power.addModifier(card, 1)
+                creatureEnteringBattlefield.toughness.addModifier(card, 1)
                 println("\t $card applied modifier to $creatureEnteringBattlefield")
             }
 
             if (creatureEnteringBattlefield is BenalishMarshal && card is CreatureCard) {
-                card.addPowerModifier(Modifier(creatureEnteringBattlefield, 1))
-                card.addToughnessModifier(Modifier(creatureEnteringBattlefield, 1))
+                card.power.addModifier(creatureEnteringBattlefield, 1)
+                card.toughness.addModifier(creatureEnteringBattlefield, 1)
                 println("\t $creatureEnteringBattlefield applied modifier to $card")
             }
         }
@@ -112,8 +112,8 @@ class FirstNaiveGameLoop : GameLoop() {
         if (creatureLeavingBattlefield is BenalishMarshal) {
             for (cardOnBoard in player.board) {
                 if (cardOnBoard is CreatureCard) {
-                    cardOnBoard.removePowerModifiers(creatureLeavingBattlefield)
-                    cardOnBoard.removeToughnessModifiers(creatureLeavingBattlefield)
+                    cardOnBoard.power.removeModifiers(creatureLeavingBattlefield)
+                    cardOnBoard.toughness.removeModifiers(creatureLeavingBattlefield)
                 }
             }
         }
@@ -154,8 +154,8 @@ class FirstNaiveGameLoop : GameLoop() {
             if (blockerAction != null) {
                 resolveBlockAction(blockerAction, attackingPlayer, defendingPlayer)
             } else {
-                println("\t ${attackAction.creatureCard} deals ${attackAction.creatureCard.getCurrentPower()} to ${attackAction.target}")
-                attackAction.target.life -= attackAction.creatureCard.getCurrentPower()
+                println("\t ${attackAction.creatureCard} deals ${attackAction.creatureCard.power.getCurrentValue()} to ${attackAction.target}")
+                attackAction.target.life -= attackAction.creatureCard.power.getCurrentValue()
             }
         }
     }
@@ -165,23 +165,23 @@ class FirstNaiveGameLoop : GameLoop() {
         val blockingCreatures = blockAction.blockingCreatures.toMutableList()
         println("\t $blockedCreature blocked by $blockingCreatures")
 
-        var remainingDamagesToDealToBlockingCreatures = blockedCreature.getCurrentPower()
+        var remainingDamagesToDealToBlockingCreatures = blockedCreature.power.getCurrentValue()
         var damagesDealtToBlockedCreature = 0
 
         while (remainingDamagesToDealToBlockingCreatures > 0 && blockingCreatures.isNotEmpty()) {
             val blockingCreature = blockingCreatures.removeAt(0)
-            damagesDealtToBlockedCreature += blockingCreature.getCurrentPower()
+            damagesDealtToBlockedCreature += blockingCreature.power.getCurrentValue()
             val damagesDealtToBlockingCreature =
-                Math.min(remainingDamagesToDealToBlockingCreatures, blockingCreature.getCurrentToughness())
+                Math.min(remainingDamagesToDealToBlockingCreatures, blockingCreature.toughness.getCurrentValue())
             remainingDamagesToDealToBlockingCreatures -= damagesDealtToBlockingCreature
 
-            if (damagesDealtToBlockingCreature >= blockingCreature.getCurrentToughness()) {
+            if (damagesDealtToBlockingCreature >= blockingCreature.toughness.getCurrentValue()) {
                 defendingPlayer.board.remove(blockingCreature)
                 println("\t Blocking creature $blockingCreature dies.")
                 handleCreatureLeaveBattlefield(blockingCreature, defendingPlayer, attackingPlayer)
             }
 
-            if (damagesDealtToBlockedCreature >= blockedCreature.getCurrentToughness()) {
+            if (damagesDealtToBlockedCreature >= blockedCreature.toughness.getCurrentValue()) {
                 attackingPlayer.board.remove(blockedCreature)
                 println("\t Blocked creature $blockedCreature dies.")
                 handleCreatureLeaveBattlefield(blockedCreature, attackingPlayer, defendingPlayer)
