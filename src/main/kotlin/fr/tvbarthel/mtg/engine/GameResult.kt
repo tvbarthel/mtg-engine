@@ -1,16 +1,11 @@
 package fr.tvbarthel.mtg.engine
 
-import fr.tvbarthel.mtg.engine.opening.OpeningOutput
-import fr.tvbarthel.mtg.engine.playing.PlayingOutput
-
 /**
  * Encapsulate every game output.
  * @param config game input which lead to the given result.
- * @param openingResult result of the opening stage.
- * @param playingResult result of the playing stage.
+ * @param finalState last state leading to the victory of one agent.
  */
 data class GameResult(
     val config: GameConfig,
-    val openingResult: OpeningOutput,
-    val playingResult: PlayingOutput
+    val finalState: GameState
 )

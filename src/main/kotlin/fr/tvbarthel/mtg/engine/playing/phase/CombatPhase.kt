@@ -1,5 +1,6 @@
 package fr.tvbarthel.mtg.engine.playing.phase
 
+import fr.tvbarthel.mtg.engine.Agent
 import fr.tvbarthel.mtg.engine.GameState
 import fr.tvbarthel.mtg.engine.Phase
 import fr.tvbarthel.mtg.engine.playing.step.*
@@ -24,11 +25,11 @@ class CombatPhase(
     private val damageStep: DamageStep = DamageStep(),
     private val endOfCombatStep: EndOfCombatStep = EndOfCombatStep()
 ) : Phase {
-    override fun proceed(gameState: GameState): GameState {
-        var intermediateState = beginningStep.proceed(gameState)
-        intermediateState = attackersStep.proceed(intermediateState)
-        intermediateState = blockersStep.proceed(intermediateState)
-        intermediateState = damageStep.proceed(intermediateState)
-        return endOfCombatStep.proceed(intermediateState)
+    override fun proceed(agents: Map<Int, Agent>, state: GameState): GameState {
+        var intermediateState = beginningStep.proceed(agents, state)
+        intermediateState = attackersStep.proceed(agents, intermediateState)
+        intermediateState = blockersStep.proceed(agents, intermediateState)
+        intermediateState = damageStep.proceed(agents, intermediateState)
+        return endOfCombatStep.proceed(agents, intermediateState)
     }
 }

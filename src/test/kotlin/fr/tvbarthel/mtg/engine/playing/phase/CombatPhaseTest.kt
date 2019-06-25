@@ -1,5 +1,6 @@
 package fr.tvbarthel.mtg.engine.playing.phase
 
+import fr.tvbarthel.mtg.engine.Agent
 import fr.tvbarthel.mtg.engine.GameState
 import fr.tvbarthel.mtg.engine.playing.step.*
 import io.kotlintest.specs.StringSpec
@@ -27,6 +28,9 @@ class CombatPhaseTest : StringSpec() {
     @RelaxedMockK
     lateinit var endOfCombatStep: EndOfCombatStep
 
+    @RelaxedMockK
+    lateinit var agents: Map<Int, Agent>
+
     init {
         MockKAnnotations.init(this)
 
@@ -35,15 +39,15 @@ class CombatPhaseTest : StringSpec() {
             val state = GameState(1239407L)
 
             // when
-            CombatPhase(beginningStep, attackersStep, blockersStep, damageStep, endOfCombatStep).proceed(state)
+            CombatPhase(beginningStep, attackersStep, blockersStep, damageStep, endOfCombatStep).proceed(agents, state)
 
             // then
             verifyOrder {
-                beginningStep.proceed(any())
-                attackersStep.proceed(any())
-                blockersStep.proceed(any())
-                damageStep.proceed(any())
-                endOfCombatStep.proceed(any())
+                beginningStep.proceed(eq(agents), any())
+                attackersStep.proceed(eq(agents), any())
+                blockersStep.proceed(eq(agents), any())
+                damageStep.proceed(eq(agents), any())
+                endOfCombatStep.proceed(eq(agents), any())
             }
         }
     }

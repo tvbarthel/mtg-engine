@@ -1,5 +1,6 @@
 package fr.tvbarthel.mtg.engine.playing.step
 
+import fr.tvbarthel.mtg.engine.Agent
 import fr.tvbarthel.mtg.engine.GameState
 import fr.tvbarthel.mtg.engine.Step
 
@@ -12,8 +13,8 @@ import fr.tvbarthel.mtg.engine.Step
  *
  * https://mtg.gamepedia.com/Ending_phase#Cleanup_step
  */
-class CleanupStep() : Step {
-    override fun proceed(gameState: GameState): GameState {
-        return gameState
+class CleanupStep : Step {
+    override fun proceed(agents: Map<Int, Agent>, state: GameState): GameState {
+        return state
     }
 }

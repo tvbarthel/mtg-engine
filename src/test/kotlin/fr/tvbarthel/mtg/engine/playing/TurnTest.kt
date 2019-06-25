@@ -1,5 +1,6 @@
 package fr.tvbarthel.mtg.engine.playing
 
+import fr.tvbarthel.mtg.engine.Agent
 import fr.tvbarthel.mtg.engine.GameState
 import fr.tvbarthel.mtg.engine.playing.phase.BeginningPhase
 import fr.tvbarthel.mtg.engine.playing.phase.CombatPhase
@@ -27,6 +28,9 @@ class TurnTest : StringSpec() {
     @RelaxedMockK
     lateinit var endingPhase: EndingPhase
 
+    @RelaxedMockK
+    lateinit var agents: Map<Int, Agent>
+
     init {
         MockKAnnotations.init(this)
 
@@ -35,15 +39,15 @@ class TurnTest : StringSpec() {
             val state = GameState(12354890L)
 
             // when
-            Turn(beginningPhase, mainPhase, combatPhase, endingPhase).play(state)
+            Turn(beginningPhase, mainPhase, combatPhase, endingPhase).play(agents, state)
 
             // then
             verifyOrder {
-                beginningPhase.proceed(any())
-                mainPhase.proceed(any())
-                combatPhase.proceed(any())
-                mainPhase.proceed(any())
-                endingPhase.proceed(any())
+                beginningPhase.proceed(eq(agents), any())
+                mainPhase.proceed(eq(agents), any())
+                combatPhase.proceed(eq(agents), any())
+                mainPhase.proceed(eq(agents), any())
+                endingPhase.proceed(eq(agents), any())
             }
         }
     }

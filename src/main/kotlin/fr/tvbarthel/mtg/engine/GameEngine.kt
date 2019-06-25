@@ -1,8 +1,6 @@
 package fr.tvbarthel.mtg.engine
 
-import fr.tvbarthel.mtg.engine.opening.OpeningInput
 import fr.tvbarthel.mtg.engine.opening.OpeningStage
-import fr.tvbarthel.mtg.engine.playing.PlayingInput
 import fr.tvbarthel.mtg.engine.playing.PlayingStage
 
 /**
@@ -19,8 +17,14 @@ class GameEngine(
      * @return output of the game - ake game result.
      */
     fun simulate(config: GameConfig): GameResult {
-        val openingOutput = openingStage.proceed(OpeningInput())
-        val playingOutput = playingStage.proceed(PlayingInput())
-        return GameResult(config, openingOutput, playingOutput)
+        var state = config.state
+
+        if (config.state.turn == 0) {
+            state = openingStage.proceed(config.agents, state)
+        }
+
+        state = playingStage.proceed(config.agents, state)
+
+        return GameResult(config, state)
     }
 }

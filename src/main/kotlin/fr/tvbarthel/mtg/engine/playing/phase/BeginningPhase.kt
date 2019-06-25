@@ -1,5 +1,6 @@
 package fr.tvbarthel.mtg.engine.playing.phase
 
+import fr.tvbarthel.mtg.engine.Agent
 import fr.tvbarthel.mtg.engine.GameState
 import fr.tvbarthel.mtg.engine.Phase
 import fr.tvbarthel.mtg.engine.playing.step.DrawStep
@@ -19,9 +20,9 @@ class BeginningPhase(
     private val upkeepStep: UpkeepStep = UpkeepStep(),
     private val drawStep: DrawStep = DrawStep()
 ) : Phase {
-    override fun proceed(gameState: GameState): GameState {
-        var intermediateState = untapStep.proceed(gameState)
-        intermediateState = upkeepStep.proceed(intermediateState)
-        return drawStep.proceed(intermediateState)
+    override fun proceed(agents: Map<Int, Agent>, state: GameState): GameState {
+        var intermediateState = untapStep.proceed(agents, state)
+        intermediateState = upkeepStep.proceed(agents, intermediateState)
+        return drawStep.proceed(agents, intermediateState)
     }
 }
