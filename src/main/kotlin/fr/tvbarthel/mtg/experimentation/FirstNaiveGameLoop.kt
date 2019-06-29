@@ -1,6 +1,7 @@
 package fr.tvbarthel.mtg.experimentation
 
 import java.rmi.UnexpectedException
+import kotlin.math.min
 
 /**
  * Very first game loop implementation: very naive approach that centralises all the logic into the game loop itself.
@@ -37,7 +38,7 @@ class FirstNaiveGameLoop : GameLoop() {
         val stepContext = StepContext(turnContext, step)
 
         println("\nPlaying step for turn $turn $step ---->")
-        handleStepStart(step, activePlayer, opponentPlayer)
+        handleStepStart(stepContext, activePlayer, opponentPlayer)
 
         while (true) {
             val player1Action = activePlayer.getAction(turn, step)
@@ -177,11 +178,15 @@ class FirstNaiveGameLoop : GameLoop() {
             if (instant.target is Player) {
                 instant.target.life -= 2
             } else if (instant.target is CreatureCard) {
+                val damages = IntValueModifier(context.turnContext, -2)
+                instant.target.toughness.addModifier(damages)
+
                 val isKilled = !instant.target.isIndestructible()
-                        && instant.target.toughness.getCurrentValue() <= 2
-                val owner = getOwner(context.turnContext, instant.target)
+                        && instant.target.toughness.getCurrentValue() <= 0
+
                 if (isKilled) {
                     println("\t Shock killed ${instant.target}")
+                    val owner = getOwner(context.turnContext, instant.target)
                     owner.board.remove(instant.target)
                     handleCreatureLeaveBattlefield(instant.target, opponent, player)
                 }
@@ -189,10 +194,10 @@ class FirstNaiveGameLoop : GameLoop() {
         }
     }
 
-    private fun handleStepStart(step: Step, player: Player, opponent: Player) {
-        when (step) {
+    private fun handleStepStart(context: StepContext, player: Player, opponent: Player) {
+        when (context.step) {
             Step.CombatPhaseDamageStep -> {
-                resolveCombatDamages(player, opponent)
+                resolveCombatDamages(context, player, opponent)
             }
             else -> {
 
@@ -220,7 +225,7 @@ class FirstNaiveGameLoop : GameLoop() {
         }
     }
 
-    private fun resolveCombatDamages(attackingPlayer: Player, defendingPlayer: Player) {
+    private fun resolveCombatDamages(context: StepContext, attackingPlayer: Player, defendingPlayer: Player) {
         val blockerMap =
             blockActions.map { blockAction -> blockAction.blockedCreature.id to blockAction }.toMap()
 
@@ -228,7 +233,7 @@ class FirstNaiveGameLoop : GameLoop() {
             val blockerAction = blockerMap[attackAction.creatureCard.id]
 
             if (blockerAction != null) {
-                resolveBlockAction(blockerAction, attackingPlayer, defendingPlayer)
+                resolveBlockAction(context, blockerAction, attackingPlayer, defendingPlayer)
             } else {
                 println("\t ${attackAction.creatureCard} deals ${attackAction.creatureCard.power.getCurrentValue()} to ${attackAction.target}")
                 attackAction.target.life -= attackAction.creatureCard.power.getCurrentValue()
@@ -236,7 +241,12 @@ class FirstNaiveGameLoop : GameLoop() {
         }
     }
 
-    private fun resolveBlockAction(blockAction: BlockAction, attackingPlayer: Player, defendingPlayer: Player) {
+    private fun resolveBlockAction(
+        context: StepContext,
+        blockAction: BlockAction,
+        attackingPlayer: Player,
+        defendingPlayer: Player
+    ) {
         val blockedCreature = blockAction.blockedCreature
         val blockingCreatures = blockAction.blockingCreatures.toMutableList()
         println("\t $blockedCreature blocked by $blockingCreatures")
@@ -248,10 +258,16 @@ class FirstNaiveGameLoop : GameLoop() {
             val blockingCreature = blockingCreatures.removeAt(0)
             damagesDealtToBlockedCreature += blockingCreature.power.getCurrentValue()
             val damagesDealtToBlockingCreature =
-                Math.min(remainingDamagesToDealToBlockingCreatures, blockingCreature.toughness.getCurrentValue())
+                min(remainingDamagesToDealToBlockingCreatures, blockingCreature.toughness.getCurrentValue())
             remainingDamagesToDealToBlockingCreatures -= damagesDealtToBlockingCreature
 
-            if (damagesDealtToBlockingCreature >= blockingCreature.toughness.getCurrentValue()) {
+            val damageToBlockedCreature = IntValueModifier(context.turnContext, -damagesDealtToBlockedCreature)
+            val damageToBlockingCreature = IntValueModifier(context.turnContext, -damagesDealtToBlockingCreature)
+
+            blockedCreature.toughness.addModifier(damageToBlockedCreature)
+            blockingCreature.toughness.addModifier(damageToBlockingCreature)
+
+            if (blockingCreature.toughness.getCurrentValue() <= 0) {
                 if (blockingCreature.isIndestructible()) {
                     println("\t Blocking creature is indestructible. It won't die.")
                 } else {
@@ -261,7 +277,7 @@ class FirstNaiveGameLoop : GameLoop() {
                 }
             }
 
-            if (damagesDealtToBlockedCreature >= blockedCreature.toughness.getCurrentValue()) {
+            if (blockedCreature.toughness.getCurrentValue() <= 0) {
                 if (blockedCreature.isIndestructible()) {
                     println("\t Blocked creature is indestructible. It won't die.")
                 } else {
