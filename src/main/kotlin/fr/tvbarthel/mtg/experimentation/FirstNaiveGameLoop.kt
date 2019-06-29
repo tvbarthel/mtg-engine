@@ -133,11 +133,11 @@ class FirstNaiveGameLoop : GameLoop() {
 
     private fun handleCreatureLeaveBattlefield(
         creatureLeavingBattlefield: CreatureCard,
-        player: Player,
+        creatureOwner: Player,
         opponent: Player
     ) {
         if (creatureLeavingBattlefield is BenalishMarshal) {
-            for (cardOnBoard in player.board) {
+            for (cardOnBoard in creatureOwner.board) {
                 if (cardOnBoard is CreatureCard) {
                     cardOnBoard.power.removeModifiers(creatureLeavingBattlefield)
                     cardOnBoard.toughness.removeModifiers(creatureLeavingBattlefield)
@@ -176,6 +176,14 @@ class FirstNaiveGameLoop : GameLoop() {
         if (instant is Shock) {
             if (instant.target is Player) {
                 instant.target.life -= 2
+            } else if (instant.target is CreatureCard) {
+                val isKilled = !instant.target.isIndestructible()
+                        && instant.target.toughness.getCurrentValue() <= 2
+                if (isKilled) {
+                    println("\t Shock killed ${instant.target}")
+                    opponent.board.remove(instant.target)
+                    handleCreatureLeaveBattlefield(instant.target, opponent, player)
+                }
             }
         }
     }
