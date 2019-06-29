@@ -196,6 +196,10 @@ class FirstNaiveGameLoop : GameLoop() {
 
     private fun handleStepStart(context: StepContext, player: Player, opponent: Player) {
         when (context.step) {
+            Step.BeginningPhaseUntapStep -> {
+                val cleanDamages = RemoveDamages(context.turnContext)
+                cleanupActions.add(cleanDamages)
+            }
             Step.CombatPhaseDamageStep -> {
                 resolveCombatDamages(context, player, opponent)
             }
@@ -309,6 +313,22 @@ class FirstNaiveGameLoop : GameLoop() {
         override fun clean() {
             target.removeModifier(modifier)
         }
+    }
+
+    private class RemoveDamages(val turnContext: TurnContext) : CleanupAction {
+        override fun clean() {
+            removeDamages(turnContext.activePlayer)
+            removeDamages(turnContext.opponentPlayer)
+        }
+
+        private fun removeDamages(player: Player) {
+            for (card in player.board) {
+                if (card is CreatureCard) {
+                    card.toughness.removeModifiers(turnContext)
+                }
+            }
+        }
+
     }
 
 }

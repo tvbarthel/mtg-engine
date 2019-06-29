@@ -40,6 +40,27 @@ class ShockTest : StringSpec({
         player2.board.size shouldBe 0
     }
 
+    "Do not kill opponent creature with shock if toughness is greater than damages" {
+        // Given
+        val player1 = ScriptedPlayer("Ava")
+        val player2 = ScriptedPlayer("Williams")
+        val creatureP2 = FakeCreature("fake-creature-p2", 2, 3)
+        val shock = Shock("p1", creatureP2)
+
+        player2.board.add(creatureP2)
+
+        // When
+        ScriptedActionBuilder(player1, player2)
+            // Turn 0 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, CastInstantAction(shock))
+            .playTurns(instantiateGameLoop(), player1, player2)
+
+        // Then
+        player2.board.size shouldBe 1
+        player2.board[0] shouldBe creatureP2
+        creatureP2.toughness.getCurrentValue() shouldBe 3
+    }
+
     "Kill my creature with shock" {
         // Given
         val player1 = ScriptedPlayer("Ava")
