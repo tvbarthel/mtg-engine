@@ -1,5 +1,7 @@
 package fr.tvbarthel.mtg.experimentation
 
+import java.rmi.UnexpectedException
+
 /**
  * Very first game loop implementation: very naive approach that centralises all the logic into the game loop itself.
  */
@@ -31,6 +33,7 @@ class FirstNaiveGameLoop : GameLoop() {
         val turn = turnContext.turnIndex
         val activePlayer = turnContext.activePlayer
         val opponentPlayer = turnContext.opponentPlayer
+        val stepContext = StepContext(turnContext, step)
 
         println("\nPlaying step for turn $turn $step ---->")
         handleStepStart(step, activePlayer, opponentPlayer)
@@ -38,11 +41,11 @@ class FirstNaiveGameLoop : GameLoop() {
         while (true) {
             val player1Action = activePlayer.getAction(turn, step)
             println("\t Player $activePlayer Action -> $player1Action")
-            handlePlayerAction(activePlayer, opponentPlayer, player1Action)
+            handlePlayerAction(stepContext, activePlayer, opponentPlayer, player1Action)
 
             val player2Action = opponentPlayer.getAction(turn, step)
             println("\t Player $opponentPlayer Action -> $player2Action")
-            handlePlayerAction(opponentPlayer, activePlayer, player2Action)
+            handlePlayerAction(stepContext, opponentPlayer, activePlayer, player2Action)
 
             if (player1Action == null && player2Action == null) {
                 break
@@ -52,7 +55,7 @@ class FirstNaiveGameLoop : GameLoop() {
         println("Playing step for turn $turn $step <----")
     }
 
-    private fun handlePlayerAction(player: Player, opponent: Player, action: Action?) {
+    private fun handlePlayerAction(context: StepContext, player: Player, opponent: Player, action: Action?) {
         if (action == null) {
             return
         }
@@ -71,7 +74,7 @@ class FirstNaiveGameLoop : GameLoop() {
 
         if (action is CastCreatureAction) {
             player.board.add(action.creatureCard)
-            handleCreatureEnterBattlefield(action.creatureCard, player, opponent)
+            handleCreatureEnterBattlefield(context, action.creatureCard, player, opponent)
         }
 
         if (action is CastEnchantmentAction) {
@@ -80,6 +83,7 @@ class FirstNaiveGameLoop : GameLoop() {
     }
 
     private fun handleCreatureEnterBattlefield(
+        context: StepContext,
         creatureEnteringBattlefield: CreatureCard,
         player: Player,
         opponent: Player
@@ -100,6 +104,20 @@ class FirstNaiveGameLoop : GameLoop() {
                 card.power.addModifier(creatureEnteringBattlefield, 1)
                 card.toughness.addModifier(creatureEnteringBattlefield, 1)
                 println("\t $creatureEnteringBattlefield applied modifier to $card")
+            }
+        }
+
+        if (creatureEnteringBattlefield is DauntlessBodyguard) {
+            val action = player.getAction(context.turnContext.turnIndex, context.step)
+            if (action is PassAction) {
+                // No-op
+            } else if (action is SelectCreatureAction) {
+                val owner = creatureEnteringBattlefield
+                val target = action.selectedCreature
+                val ability = DauntlessBodyguard.SacrificeToGiveIndestructibleAbility(owner, target)
+                owner.abilities.add(ability)
+            } else {
+                throw UnexpectedException("Not a valid action after $creatureEnteringBattlefield enters battlefield")
             }
         }
     }
@@ -189,5 +207,7 @@ class FirstNaiveGameLoop : GameLoop() {
             }
         }
     }
+
+    private class StepContext(val turnContext: TurnContext, val step: Step)
 
 }

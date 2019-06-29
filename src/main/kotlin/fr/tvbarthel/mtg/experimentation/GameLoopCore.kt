@@ -42,6 +42,12 @@ enum class Step {
 
 interface Action
 
+class PassAction : Action {
+    override fun toString(): String {
+        return "Pass Action"
+    }
+}
+
 class PlayLandAction(val landCard: LandCard) : Action {
     override fun toString(): String {
         return "PlayLand Action"
@@ -99,6 +105,12 @@ class BlockAction(val blockedCreature: CreatureCard, val blockingCreatures: List
     }
 }
 
+class SelectCreatureAction(val selectedCreature: CreatureCard) : Action {
+    override fun toString(): String {
+        return "SelectCreature Action $selectedCreature"
+    }
+}
+
 class TurnContext(
     val turnIndex: Int,
     val activePlayer: Player,
@@ -114,7 +126,6 @@ abstract class Player {
     abstract fun getAction(turn: Int, step: Step): Action?
 
 }
-
 
 class ScriptedActionBuilder(private val player1: Player, private val player2: Player) {
 
@@ -248,7 +259,11 @@ class ModifiableIntValue(private val initialValue: Int) {
 
 class IntValueModifier(val owner: Any, val amount: Int)
 
+interface Ability
+
 abstract class Card(val id: String) {
+    val abilities = mutableListOf<Ability>()
+
     abstract fun getName(): String
 }
 
@@ -268,6 +283,12 @@ class SanctuaryCat(id: String) : CreatureCard(id, 1, 2) {
 
 class BenalishMarshal(id: String) : CreatureCard(id, 3, 3) {
     override fun getName() = "Benalish Marshal"
+}
+
+class DauntlessBodyguard(id: String) : CreatureCard(id, 2, 1) {
+    override fun getName() = "Dauntless Bodyguard"
+
+    class SacrificeToGiveIndestructibleAbility(val owner: DauntlessBodyguard, val target: CreatureCard) : Ability
 }
 
 class FakeCreature(id: String, power: Int, toughness: Int) : CreatureCard(id, power, toughness) {
