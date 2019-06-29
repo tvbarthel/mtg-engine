@@ -179,9 +179,10 @@ class FirstNaiveGameLoop : GameLoop() {
             } else if (instant.target is CreatureCard) {
                 val isKilled = !instant.target.isIndestructible()
                         && instant.target.toughness.getCurrentValue() <= 2
+                val owner = getOwner(context.turnContext, instant.target)
                 if (isKilled) {
                     println("\t Shock killed ${instant.target}")
-                    opponent.board.remove(instant.target)
+                    owner.board.remove(instant.target)
                     handleCreatureLeaveBattlefield(instant.target, opponent, player)
                 }
             }
@@ -270,6 +271,14 @@ class FirstNaiveGameLoop : GameLoop() {
                 }
                 break
             }
+        }
+    }
+
+    private fun getOwner(turnContext: TurnContext, creatureCard: CreatureCard): Player {
+        return when {
+            turnContext.activePlayer.board.contains(creatureCard) -> turnContext.activePlayer
+            turnContext.opponentPlayer.board.contains(creatureCard) -> turnContext.opponentPlayer
+            else -> throw IllegalArgumentException("No owner found for creature $creatureCard")
         }
     }
 

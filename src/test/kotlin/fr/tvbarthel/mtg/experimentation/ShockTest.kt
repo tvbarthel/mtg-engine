@@ -39,4 +39,23 @@ class ShockTest : StringSpec({
         // Then
         player2.board.size shouldBe 0
     }
+
+    "Kill my creature with shock" {
+        // Given
+        val player1 = ScriptedPlayer("Ava")
+        val player2 = ScriptedPlayer("Williams")
+        val creatureP1 = FakeCreature("fake-creature-p2", 2, 2)
+        val shock = Shock("p1", creatureP1)
+
+        player1.board.add(creatureP1)
+
+        // When
+        ScriptedActionBuilder(player1, player2)
+            // Turn 0 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, CastInstantAction(shock))
+            .playTurns(instantiateGameLoop(), player1, player2)
+
+        // Then
+        player1.board.size shouldBe 0
+    }
 })
