@@ -9,6 +9,7 @@ class FirstNaiveGameLoop : GameLoop() {
 
     private val attackActions = mutableListOf<AttackAction>()
     private val blockActions = mutableListOf<BlockAction>()
+    private val cleanupActions = mutableListOf<CleanupAction>()
 
     override fun playTurn(turnContext: TurnContext) {
         playStep(turnContext, Step.BeginningPhaseUntapStep)
@@ -80,6 +81,10 @@ class FirstNaiveGameLoop : GameLoop() {
         if (action is CastEnchantmentAction) {
             player.board.add(action.enchantmentCard)
         }
+
+        if (action is ActivateAbilityAction) {
+            handleAbilityActivated(context, action.ability, player, opponent)
+        }
     }
 
     private fun handleCreatureEnterBattlefield(
@@ -137,6 +142,27 @@ class FirstNaiveGameLoop : GameLoop() {
         }
     }
 
+    private fun handleAbilityActivated(
+        context: StepContext,
+        ability: Ability,
+        player: Player,
+        opponent: Player
+    ) {
+        if (ability is DauntlessBodyguard.SacrificeToGiveIndestructibleAbility) {
+            // Give indestructible until end of turn
+            val modifier = BooleanValueModifier(ability.target, true)
+            ability.target.indestructible.addModifier(modifier)
+            val cleanupAction = RemoveBooleanModifier(ability.target.indestructible, modifier)
+            cleanupActions.add(cleanupAction)
+            println("\t ${ability.target} gains indestructible until end of turns.")
+
+            // Sacrifice dauntless bodyguard
+            player.board.remove(ability.owner)
+            handleCreatureLeaveBattlefield(ability.owner, player, opponent)
+            println("\t ${ability.owner} is sacrificed.")
+        }
+    }
+
     private fun handleStepStart(step: Step, player: Player, opponent: Player) {
         when (step) {
             Step.CombatPhaseDamageStep -> {
@@ -156,6 +182,12 @@ class FirstNaiveGameLoop : GameLoop() {
 
                 println("\t cleaning block actions")
                 blockActions.clear()
+
+                for (cleanupTarget in cleanupActions) {
+                    cleanupTarget.clean()
+                }
+                cleanupActions.clear()
+
             }
             else -> {
             }
@@ -194,20 +226,39 @@ class FirstNaiveGameLoop : GameLoop() {
             remainingDamagesToDealToBlockingCreatures -= damagesDealtToBlockingCreature
 
             if (damagesDealtToBlockingCreature >= blockingCreature.toughness.getCurrentValue()) {
-                defendingPlayer.board.remove(blockingCreature)
-                println("\t Blocking creature $blockingCreature dies.")
-                handleCreatureLeaveBattlefield(blockingCreature, defendingPlayer, attackingPlayer)
+                if (blockingCreature.isIndestructible()) {
+                    println("\t Blocking creature is indestructible. It won't die.")
+                } else {
+                    defendingPlayer.board.remove(blockingCreature)
+                    println("\t Blocking creature $blockingCreature dies.")
+                    handleCreatureLeaveBattlefield(blockingCreature, defendingPlayer, attackingPlayer)
+                }
             }
 
             if (damagesDealtToBlockedCreature >= blockedCreature.toughness.getCurrentValue()) {
-                attackingPlayer.board.remove(blockedCreature)
-                println("\t Blocked creature $blockedCreature dies.")
-                handleCreatureLeaveBattlefield(blockedCreature, attackingPlayer, defendingPlayer)
+                if (blockedCreature.isIndestructible()) {
+                    println("\t Blocked creature is indestructible. It won't die.")
+                } else {
+                    attackingPlayer.board.remove(blockedCreature)
+                    println("\t Blocked creature $blockedCreature dies.")
+                    handleCreatureLeaveBattlefield(blockedCreature, attackingPlayer, defendingPlayer)
+                }
                 break
             }
         }
     }
 
     private class StepContext(val turnContext: TurnContext, val step: Step)
+
+    interface CleanupAction {
+        fun clean()
+    }
+
+    private class RemoveBooleanModifier(val target: ModifiableBooleanValue, val modifier: BooleanValueModifier) :
+        CleanupAction {
+        override fun clean() {
+            target.removeModifier(modifier)
+        }
+    }
 
 }

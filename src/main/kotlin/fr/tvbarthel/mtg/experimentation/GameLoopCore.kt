@@ -66,6 +66,12 @@ class CastEnchantmentAction(val enchantmentCard: EnchantmentCard) : Action {
     }
 }
 
+class ActivateAbilityAction(val ability: Ability) : Action {
+    override fun toString(): String {
+        return "ActivateAbility Action $ability"
+    }
+}
+
 class DeclareAttackersAction(val attackActions: List<AttackAction>) : Action {
 
     constructor(creatureCard: CreatureCard, target: Player) : this(AttackAction(creatureCard, target))
@@ -259,6 +265,28 @@ class ModifiableIntValue(private val initialValue: Int) {
 
 class IntValueModifier(val owner: Any, val amount: Int)
 
+class ModifiableBooleanValue(private val initialValue: Boolean) {
+    private val modifiers = mutableListOf<BooleanValueModifier>()
+
+    fun getCurrentValue(): Boolean {
+        if (modifiers.isEmpty()) {
+            return initialValue
+        }
+
+        return modifiers.last().value
+    }
+
+    fun addModifier(modifier: BooleanValueModifier) {
+        modifiers.add(modifier)
+    }
+
+    fun removeModifier(modifier: BooleanValueModifier) {
+        modifiers.remove(modifier)
+    }
+}
+
+class BooleanValueModifier(val target: CreatureCard, val value: Boolean)
+
 interface Ability
 
 abstract class Card(val id: String) {
@@ -267,13 +295,23 @@ abstract class Card(val id: String) {
     abstract fun getName(): String
 }
 
-abstract class CreatureCard(id: String, private val initialPower: Int, private val initialToughness: Int) : Card(id) {
+abstract class CreatureCard(
+    id: String,
+    private val initialPower: Int,
+    private val initialToughness: Int,
+    private val initialIndestructible: Boolean = false
+) : Card(id) {
 
     val power = ModifiableIntValue(initialPower)
     val toughness = ModifiableIntValue(initialToughness)
+    val indestructible = ModifiableBooleanValue(initialIndestructible)
 
     override fun toString(): String {
         return "CreatureCard{name: ${getName()}, initialPower:$initialPower, initialToughness:$initialToughness}"
+    }
+
+    fun isIndestructible(): Boolean {
+        return indestructible.getCurrentValue()
     }
 }
 
