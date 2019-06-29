@@ -82,6 +82,10 @@ class FirstNaiveGameLoop : GameLoop() {
             player.board.add(action.enchantmentCard)
         }
 
+        if (action is CastInstantAction) {
+            handleInstantCasted(context, action.instantCard, player, opponent)
+        }
+
         if (action is ActivateAbilityAction) {
             handleAbilityActivated(context, action.ability, player, opponent)
         }
@@ -160,6 +164,19 @@ class FirstNaiveGameLoop : GameLoop() {
             player.board.remove(ability.owner)
             handleCreatureLeaveBattlefield(ability.owner, player, opponent)
             println("\t ${ability.owner} is sacrificed.")
+        }
+    }
+
+    private fun handleInstantCasted(
+        context: StepContext,
+        instant: InstantCard,
+        player: Player,
+        opponent: Player
+    ) {
+        if (instant is Shock) {
+            if (instant.target is Player) {
+                instant.target.life -= 2
+            }
         }
     }
 

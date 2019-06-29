@@ -66,6 +66,12 @@ class CastEnchantmentAction(val enchantmentCard: EnchantmentCard) : Action {
     }
 }
 
+class CastInstantAction(val instantCard: InstantCard) : Action {
+    override fun toString(): String {
+        return "CastInstant Action $instantCard"
+    }
+}
+
 class ActivateAbilityAction(val ability: Ability) : Action {
     override fun toString(): String {
         return "ActivateAbility Action $ability"
@@ -337,6 +343,10 @@ abstract class LandCard(id: String) : Card(id)
 
 abstract class BasicLandCard(id: String) : LandCard(id)
 
+class Plains(id: String) : BasicLandCard(id) {
+    override fun getName() = "Plains"
+}
+
 abstract class EnchantmentCard(id: String) : Card(id) {
     override fun toString() = "EnchantmentCard{name: ${getName()}}"
 }
@@ -345,6 +355,10 @@ class AjanisWelcome(id: String) : EnchantmentCard(id) {
     override fun getName() = "Ajani's Welcome"
 }
 
-class Plains(id: String) : BasicLandCard(id) {
-    override fun getName() = "Plains"
+abstract class InstantCard(id: String) : Card(id) {
+    override fun toString() = "InstantCard{name: ${getName()}"
+}
+
+class Shock(idSuffix: String, val target: Any) : InstantCard("shock-$idSuffix") {
+    override fun getName() = "Shock"
 }
