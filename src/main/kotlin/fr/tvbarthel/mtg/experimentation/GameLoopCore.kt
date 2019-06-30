@@ -269,6 +269,10 @@ class ModifiableIntValue(private val initialValue: Int) {
         }
     }
 
+    fun hasModifier(owner: Any): Boolean {
+        return modifiers.firstOrNull { modifier -> modifier.owner == owner } != null
+    }
+
 }
 
 class IntValueModifier(val owner: Any, val amount: Int)
@@ -290,6 +294,14 @@ class ModifiableBooleanValue(private val initialValue: Boolean) {
 
     fun removeModifier(modifier: BooleanValueModifier) {
         modifiers.remove(modifier)
+    }
+
+    fun removeModifiers(owner: Any) {
+        modifiers.removeAll { modifier -> modifier.owner == owner }
+    }
+
+    fun hasModifier(owner: Any): Boolean {
+        return modifiers.firstOrNull { modifier -> modifier.owner == owner } != null
     }
 }
 

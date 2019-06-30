@@ -157,11 +157,7 @@ class FirstNaiveGameLoop : GameLoop() {
         if (creatureEnteringBattlefield is GhituLavarunner) {
             val numberOfInstantInGraveyard = player.graveyard.count { card -> card is InstantCard }
             if (numberOfInstantInGraveyard >= 2) {
-                val powerModifier = IntValueModifier(creatureEnteringBattlefield, 1)
-                creatureEnteringBattlefield.power.addModifier(powerModifier)
-
-                val hasteModifier = BooleanValueModifier(creatureEnteringBattlefield, true)
-                creatureEnteringBattlefield.haste.addModifier(hasteModifier)
+                activateBonuses(creatureEnteringBattlefield)
             }
         }
     }
@@ -225,6 +221,25 @@ class FirstNaiveGameLoop : GameLoop() {
                     handleCreatureLeaveBattlefield(instant.target, opponent, player)
                 }
             }
+        }
+
+        player.graveyard.add(instant)
+        handleCardAddedToGraveyard(context, instant, player, opponent)
+    }
+
+    private fun handleCardAddedToGraveyard(context: StepContext, card: Card, player: Player, opponent: Player) {
+        if (card is InstantCard) {
+            player.board
+                .filterIsInstance<GhituLavarunner>()
+                .forEach { ghituLavarunner ->
+                    val activateGhituBonuses = player.graveyard.count { candidate -> candidate is InstantCard } >= 2
+                    val hasAlreadyBonuses =
+                        ghituLavarunner.haste.hasModifier(card) && ghituLavarunner.power.hasModifier(card)
+                    if (!hasAlreadyBonuses && activateGhituBonuses) {
+                        activateBonuses(ghituLavarunner)
+                    }
+                }
+
         }
     }
 
@@ -334,6 +349,15 @@ class FirstNaiveGameLoop : GameLoop() {
             turnContext.opponentPlayer.board.contains(creatureCard) -> turnContext.opponentPlayer
             else -> throw IllegalArgumentException("No owner found for creature $creatureCard")
         }
+    }
+
+
+    private fun activateBonuses(ghituLavarunner: GhituLavarunner) {
+        val powerModifier = IntValueModifier(ghituLavarunner, 1)
+        ghituLavarunner.power.addModifier(powerModifier)
+
+        val hasteModifier = BooleanValueModifier(ghituLavarunner, true)
+        ghituLavarunner.haste.addModifier(hasteModifier)
     }
 
     private class StepContext(val turnContext: TurnContext, val step: Step)
