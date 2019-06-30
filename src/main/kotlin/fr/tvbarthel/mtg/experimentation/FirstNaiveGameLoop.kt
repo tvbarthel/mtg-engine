@@ -175,6 +175,8 @@ class FirstNaiveGameLoop : GameLoop() {
                 }
             }
         }
+
+        creatureOwner.graveyard.add(creatureLeavingBattlefield)
     }
 
     private fun handleAbilityActivated(
