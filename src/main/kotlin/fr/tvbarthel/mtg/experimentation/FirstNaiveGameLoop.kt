@@ -1,6 +1,7 @@
 package fr.tvbarthel.mtg.experimentation
 
 import java.rmi.UnexpectedException
+import java.util.*
 import kotlin.math.min
 
 /**
@@ -40,28 +41,45 @@ class FirstNaiveGameLoop : GameLoop() {
         println("\nPlaying step for turn $turn $step ---->")
         handleStepStart(stepContext, activePlayer, opponentPlayer)
 
+        val actionStack = Stack<ActionContext>()
         while (true) {
             val player1Action = activePlayer.getAction(turn, step)
-            println("\t Player $activePlayer Action -> $player1Action")
-            handlePlayerAction(stepContext, activePlayer, opponentPlayer, player1Action)
+            val player1Passes = player1Action == null || player1Action is PassAction
+            if (!player1Passes) {
+                println("\t Player $activePlayer adds to stack -> $player1Action")
+                val actionContext = ActionContext(player1Action!!, activePlayer, opponentPlayer)
+                actionStack.push(actionContext)
+            } else {
+                println("\t Player $activePlayer passes.")
+            }
 
             val player2Action = opponentPlayer.getAction(turn, step)
-            println("\t Player $opponentPlayer Action -> $player2Action")
-            handlePlayerAction(stepContext, opponentPlayer, activePlayer, player2Action)
+            val player2Passes = player2Action == null || player2Action is PassAction
+            if (!player2Passes) {
+                println("\t Player $opponentPlayer adds to stack -> $player2Action")
+                val actionContext = ActionContext(player2Action!!, opponentPlayer, activePlayer)
+                actionStack.push(actionContext)
+            } else {
+                println("\t Player $opponentPlayer passes.")
+            }
 
-            if (player1Action == null && player2Action == null) {
+            if ((player1Passes || player2Passes) && actionStack.isNotEmpty()) {
+                while (actionStack.isNotEmpty()) {
+                    val actionContext = actionStack.pop()
+                    handlePlayerAction(stepContext, actionContext.activePlayer, actionContext.opponent, actionContext.action)
+                }
+            }
+
+            if (player1Passes && player2Passes) {
                 break
             }
         }
+
         handleStepEnd(step)
         println("Playing step for turn $turn $step <----")
     }
 
-    private fun handlePlayerAction(context: StepContext, player: Player, opponent: Player, action: Action?) {
-        if (action == null) {
-            return
-        }
-
+    private fun handlePlayerAction(context: StepContext, player: Player, opponent: Player, action: Action) {
         if (action is DeclareAttackersAction) {
             attackActions.addAll(action.attackActions)
         }
@@ -328,7 +346,8 @@ class FirstNaiveGameLoop : GameLoop() {
                 }
             }
         }
-
     }
+
+    private class ActionContext(val action: Action, val activePlayer: Player, val opponent: Player)
 
 }
