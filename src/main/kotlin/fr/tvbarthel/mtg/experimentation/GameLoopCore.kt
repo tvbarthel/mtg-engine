@@ -383,6 +383,10 @@ abstract class InstantCard(id: String) : Card(id) {
     override fun toString() = "InstantCard{name: ${getName()}"
 }
 
+class FakeInstant(suffix: String) : InstantCard("fake-instant-$suffix") {
+    override fun getName() = "FakeInstant $id"
+}
+
 class Shock(idSuffix: String, val target: Any) : InstantCard("shock-$idSuffix") {
     override fun getName() = "Shock"
 }
