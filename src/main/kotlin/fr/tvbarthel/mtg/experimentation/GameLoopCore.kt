@@ -139,7 +139,7 @@ abstract class Player {
 
 }
 
-class ScriptedActionBuilder(private val player1: Player, private val player2: Player) {
+class ScriptedActionBuilder(private val player1: ScriptedPlayer, private val player2: ScriptedPlayer) {
 
     private var nbTurns: Int = 0
     private val player1Actions = mutableListOf<MutableMap<Step, MutableList<Action>>>()
@@ -203,7 +203,7 @@ class ScriptedActionBuilder(private val player1: Player, private val player2: Pl
         }
     }
 
-    fun playTurns(gameLoop: GameLoop, player1: ScriptedPlayer, player2: ScriptedPlayer) {
+    fun playTurns(gameLoop: GameLoop) {
         player1.scriptedActions = getActions(player1)
         player2.scriptedActions = getActions(player2)
         gameLoop.playTurns(player1, player2, nbTurns)

@@ -23,7 +23,7 @@ class DauntlessBodyguardTest : StringSpec({
                     )
                 )
             )
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.board.size shouldBe 1
@@ -52,7 +52,7 @@ class DauntlessBodyguardTest : StringSpec({
                     )
                 )
             )
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.board.size shouldBe 2
@@ -95,7 +95,7 @@ class DauntlessBodyguardTest : StringSpec({
                     )
                 )
             )
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.board.size shouldBe 0
@@ -131,7 +131,7 @@ class DauntlessBodyguardTest : StringSpec({
                     )
                 )
             )
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player2.board.size shouldBe 1

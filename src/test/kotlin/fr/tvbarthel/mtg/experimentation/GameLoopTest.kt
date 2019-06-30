@@ -22,7 +22,7 @@ class GameLoopTest : StringSpec({
             // Turn 2 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-b")))
             // Play
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.board.size shouldBe 2
@@ -56,7 +56,7 @@ class GameLoopTest : StringSpec({
                 DeclareAttackersAction(sanctuaryCat, player2)
             )
             // Play
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.life shouldBe 20
@@ -95,7 +95,7 @@ class GameLoopTest : StringSpec({
                 )
             )
             // Play
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.life shouldBe 20
@@ -131,7 +131,7 @@ class GameLoopTest : StringSpec({
                 )
             )
             // Play
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.life shouldBe 20
@@ -166,7 +166,7 @@ class GameLoopTest : StringSpec({
                 )
             )
             // Play
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.life shouldBe 20
@@ -188,7 +188,7 @@ class GameLoopTest : StringSpec({
             // Turn 0 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, CastEnchantmentAction(ajanisWelcome))
             // Play
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.board.size shouldBe 1
@@ -213,7 +213,7 @@ class GameLoopTest : StringSpec({
             // Turn 2 - player 1 active
             .addTurn(Step.SecondMainPhaseStep, player1, CastCreatureAction(sanctuaryCat))
             // Play
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.life shouldBe 21
@@ -236,7 +236,7 @@ class GameLoopTest : StringSpec({
             // Turn 0 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, CastCreatureAction(benalishMarshal))
             // Play
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.board.size shouldBe 2
@@ -273,7 +273,7 @@ class GameLoopTest : StringSpec({
                 )
             )
             // Play
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.board.size shouldBe 1

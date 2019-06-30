@@ -14,7 +14,7 @@ class ShockTest : StringSpec({
         ScriptedActionBuilder(player1, player2)
             // Turn 0 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, CastInstantAction(shock))
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.life shouldBe 20
@@ -34,7 +34,7 @@ class ShockTest : StringSpec({
         ScriptedActionBuilder(player1, player2)
             // Turn 0 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, CastInstantAction(shock))
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player2.board.size shouldBe 0
@@ -53,7 +53,7 @@ class ShockTest : StringSpec({
         ScriptedActionBuilder(player1, player2)
             // Turn 0 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, CastInstantAction(shock))
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player2.board.size shouldBe 1
@@ -74,7 +74,7 @@ class ShockTest : StringSpec({
         ScriptedActionBuilder(player1, player2)
             // Turn 0 - player 1 active
             .addTurn(Step.FirstMainPhaseStep, player1, CastInstantAction(shock))
-            .playTurns(instantiateGameLoop(), player1, player2)
+            .playTurns(instantiateGameLoop())
 
         // Then
         player1.board.size shouldBe 0
@@ -94,16 +94,18 @@ class ShockTest : StringSpec({
         // When
         ScriptedActionBuilder(player1, player2)
             // Turn 0 - player 1 active
-            .addTurn(mapOf(
-                Step.CombatPhaseDeclareAttackersStep to listOf(
-                    Pair(player1, DeclareAttackersAction(creatureP1, player2))
-                ),
-                Step.CombatPhaseDeclareBlockersStep to listOf(
-                    Pair(player2, DeclareBlockersAction(creatureP1, creatureP2)),
-                    Pair(player1, CastInstantAction(shock))
+            .addTurn(
+                mapOf(
+                    Step.CombatPhaseDeclareAttackersStep to listOf(
+                        Pair(player1, DeclareAttackersAction(creatureP1, player2))
+                    ),
+                    Step.CombatPhaseDeclareBlockersStep to listOf(
+                        Pair(player2, DeclareBlockersAction(creatureP1, creatureP2)),
+                        Pair(player1, CastInstantAction(shock))
+                    )
                 )
-            ))
-            .playTurns(instantiateGameLoop(), player1, player2)
+            )
+            .playTurns(instantiateGameLoop())
 
         // Then
         player2.board.size shouldBe 0
