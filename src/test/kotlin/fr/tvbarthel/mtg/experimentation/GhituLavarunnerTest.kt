@@ -73,4 +73,37 @@ class GhituLavarunnerTest : StringSpec({
         ghituLavarunner.toughness.getCurrentValue() shouldBe 2
         ghituLavarunner.hasHaste() shouldBe true
     }
+
+    "Cast extra instant do not re-activate Ghitu Lavarunner bonuses" {
+        // Given
+        val player1 = ScriptedPlayer("Ava")
+        val player2 = ScriptedPlayer("Williams")
+        val ghituLavarunner = GhituLavarunner("p1")
+        val shock1 = Shock("1", player2)
+        val shock2 = Shock("2", player2)
+        val shock3 = Shock("3", player2)
+        player1.graveyard.add(shock1)
+
+
+        // When
+        ScriptedActionBuilder(player1, player2)
+            // Turn 0 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, CastCreatureAction(ghituLavarunner))
+            // Turn 1 - player 2 active
+            .addTurn()
+            // Turn 2 - player 1 active
+            .addTurn(Step.SecondMainPhaseStep, player1, CastInstantAction(shock2))
+            // Turn 3 - player 2 active
+            .addTurn()
+            // Turn 4 - player 1 active
+            .addTurn(Step.FirstMainPhaseStep, player1, CastInstantAction(shock3))
+            .playTurns(instantiateGameLoop())
+
+        // Then
+        player1.board.size shouldBe 1
+        player1.board[0] shouldBe ghituLavarunner
+        ghituLavarunner.power.getCurrentValue() shouldBe 2
+        ghituLavarunner.toughness.getCurrentValue() shouldBe 2
+        ghituLavarunner.hasHaste() shouldBe true
+    }
 })

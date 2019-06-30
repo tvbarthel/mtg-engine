@@ -233,8 +233,8 @@ class FirstNaiveGameLoop : GameLoop() {
                 .filterIsInstance<GhituLavarunner>()
                 .forEach { ghituLavarunner ->
                     val activateGhituBonuses = player.graveyard.count { candidate -> candidate is InstantCard } >= 2
-                    val hasAlreadyBonuses =
-                        ghituLavarunner.haste.hasModifier(card) && ghituLavarunner.power.hasModifier(card)
+                    val hasAlreadyBonuses = ghituLavarunner.haste.hasModifier(ghituLavarunner)
+                            && ghituLavarunner.power.hasModifier(ghituLavarunner)
                     if (!hasAlreadyBonuses && activateGhituBonuses) {
                         activateBonuses(ghituLavarunner)
                     }
