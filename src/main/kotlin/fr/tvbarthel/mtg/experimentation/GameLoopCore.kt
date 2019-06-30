@@ -135,6 +135,8 @@ abstract class Player {
 
     var board: MutableList<Card> = mutableListOf()
 
+    var graveyard: MutableList<Card> = mutableListOf()
+
     abstract fun getAction(turn: Int, step: Step): Action?
 
 }
@@ -291,7 +293,7 @@ class ModifiableBooleanValue(private val initialValue: Boolean) {
     }
 }
 
-class BooleanValueModifier(val target: CreatureCard, val value: Boolean)
+class BooleanValueModifier(val owner: CreatureCard, val value: Boolean)
 
 interface Ability
 
@@ -305,12 +307,14 @@ abstract class CreatureCard(
     id: String,
     private val initialPower: Int,
     private val initialToughness: Int,
-    private val initialIndestructible: Boolean = false
+    private val initialIndestructible: Boolean = false,
+    private val initialHaste: Boolean = false
 ) : Card(id) {
 
     val power = ModifiableIntValue(initialPower)
     val toughness = ModifiableIntValue(initialToughness)
     val indestructible = ModifiableBooleanValue(initialIndestructible)
+    val haste = ModifiableBooleanValue(initialHaste)
 
     override fun toString(): String {
         return "CreatureCard{name: ${getName()}, initialPower:$initialPower, initialToughness:$initialToughness}"
@@ -318,6 +322,10 @@ abstract class CreatureCard(
 
     fun isIndestructible(): Boolean {
         return indestructible.getCurrentValue()
+    }
+
+    fun hasHaste(): Boolean {
+        return haste.getCurrentValue()
     }
 }
 
@@ -333,6 +341,10 @@ class DauntlessBodyguard(id: String) : CreatureCard(id, 2, 1) {
     override fun getName() = "Dauntless Bodyguard"
 
     class SacrificeToGiveIndestructibleAbility(val owner: DauntlessBodyguard, val target: CreatureCard) : Ability
+}
+
+class GhituLavarunner(suffix: String) : CreatureCard("ghitu-lavaruner-$suffix", 1, 2) {
+    override fun getName() = "Ghitu Lavarunner"
 }
 
 class FakeCreature(id: String, power: Int, toughness: Int) : CreatureCard(id, power, toughness) {

@@ -66,7 +66,12 @@ class FirstNaiveGameLoop : GameLoop() {
             if ((player1Passes || player2Passes) && actionStack.isNotEmpty()) {
                 while (actionStack.isNotEmpty()) {
                     val actionContext = actionStack.pop()
-                    handlePlayerAction(stepContext, actionContext.activePlayer, actionContext.opponent, actionContext.action)
+                    handlePlayerAction(
+                        stepContext,
+                        actionContext.activePlayer,
+                        actionContext.opponent,
+                        actionContext.action
+                    )
                 }
             }
 
@@ -148,6 +153,17 @@ class FirstNaiveGameLoop : GameLoop() {
                 throw UnexpectedException("Not a valid action after $creatureEnteringBattlefield enters battlefield")
             }
         }
+
+        if (creatureEnteringBattlefield is GhituLavarunner) {
+            val numberOfInstantInGraveyard = player.graveyard.count { card -> card is InstantCard }
+            if (numberOfInstantInGraveyard >= 2) {
+                val powerModifier = IntValueModifier(creatureEnteringBattlefield, 1)
+                creatureEnteringBattlefield.power.addModifier(powerModifier)
+
+                val hasteModifier = BooleanValueModifier(creatureEnteringBattlefield, true)
+                creatureEnteringBattlefield.haste.addModifier(hasteModifier)
+            }
+        }
     }
 
     private fun handleCreatureLeaveBattlefield(
@@ -173,7 +189,7 @@ class FirstNaiveGameLoop : GameLoop() {
     ) {
         if (ability is DauntlessBodyguard.SacrificeToGiveIndestructibleAbility) {
             // Give indestructible until end of turn
-            val modifier = BooleanValueModifier(ability.target, true)
+            val modifier = BooleanValueModifier(ability.owner, true)
             ability.target.indestructible.addModifier(modifier)
             val cleanupAction = RemoveBooleanModifier(ability.target.indestructible, modifier)
             cleanupActions.add(cleanupAction)
