@@ -81,7 +81,7 @@ class FirstNaiveGameLoop : GameLoop() {
             }
         }
 
-        handleStepEnd(step)
+        handleStepEnd(stepContext, activePlayer, opponentPlayer)
         println("Playing step for turn $turn $step <----")
     }
 
@@ -274,8 +274,8 @@ class FirstNaiveGameLoop : GameLoop() {
         }
     }
 
-    private fun handleStepEnd(step: Step) {
-        when (step) {
+    private fun handleStepEnd(context: StepContext, player: Player, opponent: Player) {
+        when (context.step) {
             Step.EndingPhaseCleanupStep -> {
                 println("\t cleaning attack actions")
                 attackActions.clear()
@@ -288,6 +288,11 @@ class FirstNaiveGameLoop : GameLoop() {
                 }
                 cleanupActions.clear()
 
+            }
+            Step.BeginningPhaseDrawStep -> {
+                player.board
+                    .filterIsInstance<SagaCard>()
+                    .forEach { sagaCard -> increaseLoreCounter(context, sagaCard, player, opponent) }
             }
             else -> {
             }
