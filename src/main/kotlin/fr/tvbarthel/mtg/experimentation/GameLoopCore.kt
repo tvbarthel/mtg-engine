@@ -359,6 +359,10 @@ class GhituLavarunner(suffix: String) : CreatureCard("ghitu-lavaruner-$suffix", 
     override fun getName() = "Ghitu Lavarunner"
 }
 
+class KnightToken(suffix: String) : CreatureCard("knight-token-$suffix", 2, 2) {
+    override fun getName() = "Knight Token"
+}
+
 class FakeCreature(id: String, power: Int, toughness: Int) : CreatureCard(id, power, toughness) {
     override fun getName() = "FakeCreaure"
 }
@@ -375,8 +379,16 @@ abstract class EnchantmentCard(id: String) : Card(id) {
     override fun toString() = "EnchantmentCard{name: ${getName()}}"
 }
 
+abstract class SagaCard(id: String) : EnchantmentCard(id) {
+    override fun toString() = "SagaCard{name: ${getName()}}"
+}
+
 class AjanisWelcome(id: String) : EnchantmentCard(id) {
     override fun getName() = "Ajani's Welcome"
+}
+
+class HistoryOfBenalia(suffix: String) : SagaCard("history-of-benalia-$suffix") {
+    override fun getName() = "History Of Benalia"
 }
 
 abstract class InstantCard(id: String) : Card(id) {

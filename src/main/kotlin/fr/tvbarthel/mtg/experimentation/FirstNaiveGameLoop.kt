@@ -12,6 +12,7 @@ class FirstNaiveGameLoop : GameLoop() {
     private val attackActions = mutableListOf<AttackAction>()
     private val blockActions = mutableListOf<BlockAction>()
     private val cleanupActions = mutableListOf<CleanupAction>()
+    private val loreCounterMap = mutableMapOf<Player, MutableMap<SagaCard, Int>>()
 
     override fun playTurn(turnContext: TurnContext) {
         playStep(turnContext, Step.BeginningPhaseUntapStep)
@@ -103,7 +104,7 @@ class FirstNaiveGameLoop : GameLoop() {
         }
 
         if (action is CastEnchantmentAction) {
-            player.board.add(action.enchantmentCard)
+            handleEnchantementCasted(context, action.enchantmentCard, player, opponent)
         }
 
         if (action is CastInstantAction) {
@@ -229,6 +230,19 @@ class FirstNaiveGameLoop : GameLoop() {
         handleCardAddedToGraveyard(context, instant, player, opponent)
     }
 
+    private fun handleEnchantementCasted(
+        context: StepContext,
+        enchantmentCard: EnchantmentCard,
+        player: Player,
+        opponent: Player
+    ) {
+        player.board.add(enchantmentCard)
+
+        if (enchantmentCard is SagaCard) {
+            increaseLoreCounter(context, enchantmentCard, player, opponent)
+        }
+    }
+
     private fun handleCardAddedToGraveyard(context: StepContext, card: Card, player: Player, opponent: Player) {
         if (card is InstantCard) {
             player.board
@@ -277,6 +291,29 @@ class FirstNaiveGameLoop : GameLoop() {
             }
             else -> {
             }
+        }
+    }
+
+    private fun increaseLoreCounter(context: StepContext, sagaCard: SagaCard, player: Player, opponent: Player) {
+        val playerLoreCounters = loreCounterMap.getOrPut(player) { mutableMapOf() }
+        val oldLoreCounter = playerLoreCounters.getOrPut(sagaCard) { 0 }
+        val newLoreCounter = oldLoreCounter + 1
+
+        if (sagaCard is HistoryOfBenalia) {
+            when (newLoreCounter) {
+                1 -> {
+                    val knightToken = KnightToken("${sagaCard.id}-1")
+                    player.board.add(knightToken)
+                    handleCreatureEnterBattlefield(context, knightToken, player, opponent)
+                }
+                else -> {
+                    throw IllegalArgumentException("Invalid lore counter $newLoreCounter")
+                }
+            }
+        }
+
+        if (newLoreCounter >= 3) {
+            player.board.remove(sagaCard)
         }
     }
 
