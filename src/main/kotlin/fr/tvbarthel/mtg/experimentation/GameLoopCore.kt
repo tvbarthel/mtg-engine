@@ -14,6 +14,8 @@ package fr.tvbarthel.mtg.experimentation
 abstract class GameLoop {
     abstract fun playTurn(turnContext: TurnContext)
 
+    abstract fun playStep(turnContext: TurnContext, step: Step)
+
     fun playTurns(player1: Player, player2: Player, nbTurn: Int) {
         for (turnIndex in 0 until nbTurn) {
             if (turnIndex % 2 == 0) {
@@ -260,6 +262,12 @@ class ModifiableIntValue(private val initialValue: Int) {
         modifiers.add(modifier)
     }
 
+    fun removeModifier(modifier: IntValueModifier) {
+        if (modifiers.remove(modifier)) {
+            currentValue -= modifier.amount
+        }
+    }
+
     fun removeModifiers(owner: Any) {
         val modifiersToRemove = modifiers.filter { modifier -> modifier.owner == owner }
 
@@ -305,9 +313,16 @@ class ModifiableBooleanValue(private val initialValue: Boolean) {
     }
 }
 
-class BooleanValueModifier(val owner: CreatureCard, val value: Boolean)
+class BooleanValueModifier(val owner: Any, val value: Boolean)
 
 interface Ability
+
+enum class CreatureType {
+    CAT,
+    HUMAN,
+    KNIGHT,
+    WIZARD
+}
 
 abstract class Card(val id: String) {
     val abilities = mutableListOf<Ability>()
@@ -319,14 +334,18 @@ abstract class CreatureCard(
     id: String,
     private val initialPower: Int,
     private val initialToughness: Int,
-    private val initialIndestructible: Boolean = false,
-    private val initialHaste: Boolean = false
+    initialIndestructible: Boolean = false,
+    initialHaste: Boolean = false,
+    initialVigilance: Boolean = false,
+    initialCreatureTypes: List<CreatureType> = emptyList()
 ) : Card(id) {
 
     val power = ModifiableIntValue(initialPower)
     val toughness = ModifiableIntValue(initialToughness)
     val indestructible = ModifiableBooleanValue(initialIndestructible)
     val haste = ModifiableBooleanValue(initialHaste)
+    val vigilance = ModifiableBooleanValue(initialVigilance)
+    val creatureTypes = initialCreatureTypes.toMutableList()
 
     override fun toString(): String {
         return "CreatureCard{name: ${getName()}, initialPower:$initialPower, initialToughness:$initialToughness}"
@@ -339,27 +358,45 @@ abstract class CreatureCard(
     fun hasHaste(): Boolean {
         return haste.getCurrentValue()
     }
+
+    fun hasTypes(types: List<CreatureType>): Boolean {
+        return creatureTypes.containsAll(types)
+    }
+
+    fun hasType(type: CreatureType): Boolean {
+        return creatureTypes.contains(type)
+    }
 }
 
-class SanctuaryCat(id: String) : CreatureCard(id, 1, 2) {
+class SanctuaryCat(id: String) : CreatureCard(
+    id, 1, 2, initialCreatureTypes = listOf(CreatureType.CAT)
+) {
     override fun getName() = "SanctuaryCat"
 }
 
-class BenalishMarshal(id: String) : CreatureCard(id, 3, 3) {
+class BenalishMarshal(id: String) : CreatureCard(
+    id, 3, 3, initialCreatureTypes = listOf(CreatureType.HUMAN, CreatureType.KNIGHT)
+) {
     override fun getName() = "Benalish Marshal"
 }
 
-class DauntlessBodyguard(id: String) : CreatureCard(id, 2, 1) {
+class DauntlessBodyguard(id: String) : CreatureCard(
+    id, 2, 1, initialCreatureTypes = listOf(CreatureType.HUMAN, CreatureType.KNIGHT)
+) {
     override fun getName() = "Dauntless Bodyguard"
 
     class SacrificeToGiveIndestructibleAbility(val owner: DauntlessBodyguard, val target: CreatureCard) : Ability
 }
 
-class GhituLavarunner(suffix: String) : CreatureCard("ghitu-lavaruner-$suffix", 1, 2) {
+class GhituLavarunner(suffix: String) : CreatureCard(
+    "ghitu-lavaruner-$suffix", 1, 2, initialCreatureTypes = listOf(CreatureType.HUMAN, CreatureType.WIZARD)
+) {
     override fun getName() = "Ghitu Lavarunner"
 }
 
-class KnightToken(suffix: String) : CreatureCard("knight-token-$suffix", 2, 2) {
+class KnightToken(suffix: String) : CreatureCard(
+    "knight-token-$suffix", 2, 2, initialVigilance = true, initialCreatureTypes = listOf(CreatureType.KNIGHT)
+) {
     override fun getName() = "Knight Token"
 }
 

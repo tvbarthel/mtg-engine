@@ -32,7 +32,7 @@ class FirstNaiveGameLoop : GameLoop() {
         playStep(turnContext, Step.EndingPhaseCleanupStep)
     }
 
-    private fun playStep(turnContext: TurnContext, step: Step) {
+    override fun playStep(turnContext: TurnContext, step: Step) {
         val turn = turnContext.turnIndex
         val activePlayer = turnContext.activePlayer
         val opponentPlayer = turnContext.opponentPlayer
@@ -313,6 +313,23 @@ class FirstNaiveGameLoop : GameLoop() {
                     player.board.add(knightToken)
                     handleCreatureEnterBattlefield(context, knightToken, player, opponent)
                 }
+                3 -> {
+                    player.board.filterIsInstance<CreatureCard>()
+                        .filter { creatureCard -> creatureCard.hasType(CreatureType.KNIGHT) }
+                        .forEach { creatureCard ->
+                            val powerModifier = IntValueModifier(sagaCard, 2)
+                            val toughnessModifier = IntValueModifier(sagaCard, 1)
+
+                            creatureCard.power.addModifier(powerModifier)
+                            creatureCard.toughness.addModifier(toughnessModifier)
+
+                            val powerCleanup = RemoveIntModifier(creatureCard.power, powerModifier)
+                            val toughnessCleanup = RemoveIntModifier(creatureCard.toughness, toughnessModifier)
+
+                            cleanupActions.add(powerCleanup)
+                            cleanupActions.add(toughnessCleanup)
+                        }
+                }
                 else -> {
                     throw IllegalArgumentException("Invalid lore counter ${sagaCard.loreCounter}")
                 }
@@ -413,6 +430,13 @@ class FirstNaiveGameLoop : GameLoop() {
     }
 
     private class RemoveBooleanModifier(val target: ModifiableBooleanValue, val modifier: BooleanValueModifier) :
+        CleanupAction {
+        override fun clean() {
+            target.removeModifier(modifier)
+        }
+    }
+
+    private class RemoveIntModifier(val target: ModifiableIntValue, val modifier: IntValueModifier) :
         CleanupAction {
         override fun clean() {
             target.removeModifier(modifier)

@@ -58,4 +58,85 @@ class HistoryOfBenaliaTest : StringSpec({
         assert(player1.board[1] is KnightToken)
         assert(player1.board[2] is KnightToken)
     }
+
+    "Increase history of benalia to 3rd lore counter" {
+        // Given
+        val player1 = ScriptedPlayer("Ava")
+        val player2 = ScriptedPlayer("Williams")
+        val historyOfBenalia = HistoryOfBenalia("p1")
+        val gameLoop = instantiateGameLoop()
+
+        // When
+        ScriptedActionBuilder(player1, player2)
+            // Turn 0 - player 1 active
+            .addTurn(
+                mapOf(
+                    Step.FirstMainPhaseStep to listOf(
+                        Pair(player1, CastEnchantmentAction(historyOfBenalia))
+                    )
+                )
+            )
+            // Turn 1 - player 2 active
+            .addTurn()
+            // Turn 2 - player 1 active
+            .addTurn()
+            // Turn 3 - player 2 active
+            .addTurn()
+            .playTurns(gameLoop)
+
+        // Turn 4 - player 1 active
+        val turnContext = TurnContext(4, player1, player2)
+        gameLoop.playStep(turnContext, Step.BeginningPhaseUntapStep)
+        gameLoop.playStep(turnContext, Step.BeginningPhaseUpKeepStep)
+        gameLoop.playStep(turnContext, Step.BeginningPhaseDrawStep)
+
+        // Then
+        player1.board.size shouldBe 2
+        historyOfBenalia.loreCounter shouldBe 3
+        assert(player1.board[0] is KnightToken)
+        (player1.board[0] as KnightToken).power.getCurrentValue() shouldBe 4
+        (player1.board[0] as KnightToken).toughness.getCurrentValue() shouldBe 3
+        assert(player1.board[1] is KnightToken)
+        (player1.board[1] as KnightToken).power.getCurrentValue() shouldBe 4
+        (player1.board[1] as KnightToken).toughness.getCurrentValue() shouldBe 3
+    }
+
+    "History of benalia 3rd lore counter effects are remove at the end of the turn" {
+        // Given
+        val player1 = ScriptedPlayer("Ava")
+        val player2 = ScriptedPlayer("Williams")
+        val historyOfBenalia = HistoryOfBenalia("p1")
+        val gameLoop = instantiateGameLoop()
+
+        // When
+        ScriptedActionBuilder(player1, player2)
+            // Turn 0 - player 1 active
+            .addTurn(
+                mapOf(
+                    Step.FirstMainPhaseStep to listOf(
+                        Pair(player1, CastEnchantmentAction(historyOfBenalia))
+                    )
+                )
+            )
+            // Turn 1 - player 2 active
+            .addTurn()
+            // Turn 2 - player 1 active
+            .addTurn()
+            // Turn 3 - player 2 active
+            .addTurn()
+            // Turn 4 - player 1 active
+            .addTurn()
+            .playTurns(gameLoop)
+
+
+        // Then
+        player1.board.size shouldBe 2
+        historyOfBenalia.loreCounter shouldBe 3
+        assert(player1.board[0] is KnightToken)
+        (player1.board[0] as KnightToken).power.getCurrentValue() shouldBe 2
+        (player1.board[0] as KnightToken).toughness.getCurrentValue() shouldBe 2
+        assert(player1.board[1] is KnightToken)
+        (player1.board[1] as KnightToken).power.getCurrentValue() shouldBe 2
+        (player1.board[1] as KnightToken).toughness.getCurrentValue() shouldBe 2
+    }
 })
