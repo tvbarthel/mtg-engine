@@ -139,4 +139,56 @@ class HistoryOfBenaliaTest : StringSpec({
         (player1.board[1] as KnightToken).power.getCurrentValue() shouldBe 2
         (player1.board[1] as KnightToken).toughness.getCurrentValue() shouldBe 2
     }
+
+    "History of benalia 3rd counter effects do not apply to other knight creature" {
+        // Given
+        val player1 = ScriptedPlayer("Ava")
+        val player2 = ScriptedPlayer("Williams")
+        val historyOfBenalia = HistoryOfBenalia("p1")
+        val fakeCreature = FakeCreature("cat-p1", 1,1)
+        fakeCreature.creatureTypes.add(CreatureType.KNIGHT)
+
+        historyOfBenalia.loreCounter = 2
+        player1.board.add(historyOfBenalia)
+        player1.board.add(fakeCreature)
+        player1.scriptedActions = emptyList()
+        player2.scriptedActions = emptyList()
+        val gameLoop = instantiateGameLoop()
+
+        // Turn 0 - player 1 active
+        val turnContext = TurnContext(4, player1, player2)
+        gameLoop.playStep(turnContext, Step.BeginningPhaseUntapStep)
+        gameLoop.playStep(turnContext, Step.BeginningPhaseUpKeepStep)
+        gameLoop.playStep(turnContext, Step.BeginningPhaseDrawStep)
+
+        // Then
+        player1.board.size shouldBe 1
+        fakeCreature.power.getCurrentValue() shouldBe 3
+        fakeCreature.toughness.getCurrentValue() shouldBe 2
+    }
+
+    "History of benalia 3rd counter effects do not apply to non-knight creature" {
+        // Given
+        val player1 = ScriptedPlayer("Ava")
+        val player2 = ScriptedPlayer("Williams")
+        val historyOfBenalia = HistoryOfBenalia("p1")
+        val sanctuaryCat = SanctuaryCat("cat-p1")
+        historyOfBenalia.loreCounter = 2
+        player1.board.add(historyOfBenalia)
+        player1.board.add(sanctuaryCat)
+        player1.scriptedActions = emptyList()
+        player2.scriptedActions = emptyList()
+        val gameLoop = instantiateGameLoop()
+
+        // Turn 0 - player 1 active
+        val turnContext = TurnContext(4, player1, player2)
+        gameLoop.playStep(turnContext, Step.BeginningPhaseUntapStep)
+        gameLoop.playStep(turnContext, Step.BeginningPhaseUpKeepStep)
+        gameLoop.playStep(turnContext, Step.BeginningPhaseDrawStep)
+
+        // Then
+        player1.board.size shouldBe 1
+        sanctuaryCat.power.getCurrentValue() shouldBe 1
+        sanctuaryCat.toughness.getCurrentValue() shouldBe 2
+    }
 })
