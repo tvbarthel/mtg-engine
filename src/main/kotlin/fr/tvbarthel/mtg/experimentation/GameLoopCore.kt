@@ -380,6 +380,8 @@ abstract class EnchantmentCard(id: String) : Card(id) {
 }
 
 abstract class SagaCard(id: String) : EnchantmentCard(id) {
+    var loreCounter: Int = 0
+
     override fun toString() = "SagaCard{name: ${getName()}}"
 }
 

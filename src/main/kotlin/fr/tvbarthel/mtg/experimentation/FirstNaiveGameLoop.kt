@@ -12,7 +12,6 @@ class FirstNaiveGameLoop : GameLoop() {
     private val attackActions = mutableListOf<AttackAction>()
     private val blockActions = mutableListOf<BlockAction>()
     private val cleanupActions = mutableListOf<CleanupAction>()
-    private val loreCounterMap = mutableMapOf<Player, MutableMap<SagaCard, Int>>()
 
     override fun playTurn(turnContext: TurnContext) {
         playStep(turnContext, Step.BeginningPhaseUntapStep)
@@ -300,24 +299,27 @@ class FirstNaiveGameLoop : GameLoop() {
     }
 
     private fun increaseLoreCounter(context: StepContext, sagaCard: SagaCard, player: Player, opponent: Player) {
-        val playerLoreCounters = loreCounterMap.getOrPut(player) { mutableMapOf() }
-        val oldLoreCounter = playerLoreCounters.getOrPut(sagaCard) { 0 }
-        val newLoreCounter = oldLoreCounter + 1
+        sagaCard.loreCounter += 1
 
         if (sagaCard is HistoryOfBenalia) {
-            when (newLoreCounter) {
+            when (sagaCard.loreCounter) {
                 1 -> {
                     val knightToken = KnightToken("${sagaCard.id}-1")
                     player.board.add(knightToken)
                     handleCreatureEnterBattlefield(context, knightToken, player, opponent)
                 }
+                2 -> {
+                    val knightToken = KnightToken("${sagaCard.id}-2")
+                    player.board.add(knightToken)
+                    handleCreatureEnterBattlefield(context, knightToken, player, opponent)
+                }
                 else -> {
-                    throw IllegalArgumentException("Invalid lore counter $newLoreCounter")
+                    throw IllegalArgumentException("Invalid lore counter ${sagaCard.loreCounter}")
                 }
             }
         }
 
-        if (newLoreCounter >= 3) {
+        if (sagaCard.loreCounter >= 3) {
             player.board.remove(sagaCard)
         }
     }

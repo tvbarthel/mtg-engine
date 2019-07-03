@@ -4,7 +4,7 @@ import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
 
 class HistoryOfBenaliaTest : StringSpec({
-    "Casting history of benalia spawns a knight token" {
+    "Increase history of benalia to 1st lore counter" {
         // Given
         val player1 = ScriptedPlayer("Ava")
         val player2 = ScriptedPlayer("Williams")
@@ -25,6 +25,7 @@ class HistoryOfBenaliaTest : StringSpec({
         // Then
         player1.board.size shouldBe 2
         player1.board[0] shouldBe historyOfBenalia
+        historyOfBenalia.loreCounter shouldBe 1
         assert(player1.board[1] is KnightToken)
     }
 
@@ -53,6 +54,7 @@ class HistoryOfBenaliaTest : StringSpec({
         // Then
         player1.board.size shouldBe 3
         player1.board[0] shouldBe historyOfBenalia
+        historyOfBenalia.loreCounter shouldBe 2
         assert(player1.board[1] is KnightToken)
         assert(player1.board[2] is KnightToken)
     }
