@@ -2,6 +2,7 @@ package fr.tvbarthel.mtg.experimentation.actorgameloop
 
 import fr.tvbarthel.mtg.experimentation.*
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.*
+import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.enchantment.CastEnchantmentActor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.ResolveActionEvent
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.StartStepEvent
@@ -13,11 +14,11 @@ class ActorGameLoop : GameLoop() {
 
     init {
         attachActor(PlayLandActor())
-        attachActor(CastCreatureActor())
+        attachActor(CastCreatureActor(this))
         attachActor(DeclareAttackersActor())
         attachActor(DeclareBlockersActor())
         attachActor(ApplyCombatDamagesActor())
-        attachActor(CastEnchantmentActor())
+        attachActor(CastEnchantmentActor(this))
     }
 
     override fun playStep(turnContext: TurnContext, step: Step) {
@@ -76,14 +77,14 @@ class ActorGameLoop : GameLoop() {
         }
     }
 
-    private fun sendEvent(event: Event) {
+    internal fun sendEvent(event: Event) {
         actors.filter { actor -> actor.isAlive() }
             .forEach { actor -> actor.onEventReceived(event) }
 
         actors.removeIf { actor -> !actor.isAlive() }
     }
 
-    private fun attachActor(actor: Actor) {
+    internal fun attachActor(actor: Actor) {
         actors.add(actor)
     }
 

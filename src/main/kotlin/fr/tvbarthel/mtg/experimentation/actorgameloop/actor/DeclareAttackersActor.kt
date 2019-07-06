@@ -4,7 +4,6 @@ import fr.tvbarthel.mtg.experimentation.DeclareAttackersAction
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.ResolveActionEvent
 
-
 @Suppress("FoldInitializerAndIfToElvis")
 class DeclareAttackersActor : Actor {
 
