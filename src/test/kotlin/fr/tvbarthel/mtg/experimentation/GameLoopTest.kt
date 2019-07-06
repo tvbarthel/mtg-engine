@@ -165,38 +165,43 @@ class GameLoopTest : StringSpec({
     }
 
     "Blocked creatures dies" {
-        // Given
-        val player1 = ScriptedPlayer("Ava")
-        val player2 = ScriptedPlayer("Williams")
-        val fakeCreatureP1 = FakeCreature("fake-creature-p1", 1, 1)
-        val fakeCreatureP2 = FakeCreature("fake-creature-p2", 4, 4)
+        forall(
+            row(FirstNaiveGameLoop()),
+            row(ActorGameLoop())
+        ) { gameLoop ->
+            // Given
+            val player1 = ScriptedPlayer("Ava")
+            val player2 = ScriptedPlayer("Williams")
+            val fakeCreatureP1 = FakeCreature("fake-creature-p1", 1, 1)
+            val fakeCreatureP2 = FakeCreature("fake-creature-p2", 4, 4)
 
-        player1.board.add(fakeCreatureP1)
-        player2.board.add(fakeCreatureP2)
+            player1.board.add(fakeCreatureP1)
+            player2.board.add(fakeCreatureP2)
 
-        // When
-        ScriptedActionBuilder(player1, player2)
-            // Turn 0 - player 1 active
-            .addTurn(
-                mapOf(
-                    Step.CombatPhaseDeclareAttackersStep to listOf(
-                        Pair(player1, DeclareAttackersAction(fakeCreatureP1, player2))
-                    ),
-                    Step.CombatPhaseDeclareBlockersStep to listOf(
-                        Pair(player2, DeclareBlockersAction(fakeCreatureP1, fakeCreatureP2))
+            // When
+            ScriptedActionBuilder(player1, player2)
+                // Turn 0 - player 1 active
+                .addTurn(
+                    mapOf(
+                        Step.CombatPhaseDeclareAttackersStep to listOf(
+                            Pair(player1, DeclareAttackersAction(fakeCreatureP1, player2))
+                        ),
+                        Step.CombatPhaseDeclareBlockersStep to listOf(
+                            Pair(player2, DeclareBlockersAction(fakeCreatureP1, fakeCreatureP2))
+                        )
                     )
                 )
-            )
-            // Play
-            .playTurns(instantiateGameLoop())
+                // Play
+                .playTurns(gameLoop)
 
-        // Then
-        player1.life shouldBe 20
-        player1.board.size shouldBe 0
+            // Then
+            player1.life shouldBe 20
+            player1.board.size shouldBe 0
 
-        player2.life shouldBe 20
-        player2.board.size shouldBe 1
-        player2.board[0] shouldBe fakeCreatureP2
+            player2.life shouldBe 20
+            player2.board.size shouldBe 1
+            player2.board[0] shouldBe fakeCreatureP2
+        }
     }
 
     "Cast Enchantment Card" {
