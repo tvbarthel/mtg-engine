@@ -1,10 +1,10 @@
 package fr.tvbarthel.mtg.experimentation.actorgameloop
 
 import fr.tvbarthel.mtg.experimentation.*
-import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.Actor
-import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.PlayLandActor
+import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.*
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.ResolveActionEvent
+import fr.tvbarthel.mtg.experimentation.actorgameloop.event.StartStepEvent
 import java.util.*
 
 class ActorGameLoop : GameLoop() {
@@ -12,8 +12,11 @@ class ActorGameLoop : GameLoop() {
     private val actors = mutableListOf<Actor>()
 
     init {
-        val playLandActor = PlayLandActor()
-        attachActor(playLandActor)
+        attachActor(PlayLandActor())
+        attachActor(CastCreatureActor())
+        attachActor(DeclareAttackersActor())
+        attachActor(DeclareBlockersActor())
+        attachActor(ApplyCombatDamagesActor())
     }
 
     override fun playStep(turnContext: TurnContext, step: Step) {
@@ -21,6 +24,9 @@ class ActorGameLoop : GameLoop() {
         val activePlayer = turnContext.activePlayer
         val opponentPlayer = turnContext.opponentPlayer
         val stepContext = StepContext(turnContext, step)
+
+        val startStepEvent = StartStepEvent(stepContext)
+        sendEvent(startStepEvent)
 
         val actionStack = Stack<ActionContext>()
         while (true) {
@@ -79,8 +85,6 @@ class ActorGameLoop : GameLoop() {
     private fun attachActor(actor: Actor) {
         actors.add(actor)
     }
-
-    class StepContext(val turnContext: TurnContext, val step: Step)
 
     class ActionContext(val action: Action, val activePlayer: Player, val opponent: Player)
 

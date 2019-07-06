@@ -147,7 +147,12 @@ class TurnContext(
     val turnIndex: Int,
     val activePlayer: Player,
     val opponentPlayer: Player
-)
+) {
+    val attackActions: MutableList<AttackAction> = mutableListOf()
+    val blockActions: MutableList<BlockAction> = mutableListOf()
+}
+
+class StepContext(val turnContext: TurnContext, val step: Step)
 
 abstract class Player {
 

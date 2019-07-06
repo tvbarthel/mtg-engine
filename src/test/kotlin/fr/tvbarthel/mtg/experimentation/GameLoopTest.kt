@@ -40,38 +40,42 @@ class GameLoopTest : StringSpec({
         }
     }
 
-
     "Attack opponent" {
-        // Given
-        val player1 = ScriptedPlayer("Ava")
-        val player2 = ScriptedPlayer("Williams")
-        val sanctuaryCat = SanctuaryCat("sanctuary-cat-1")
+        forall(
+            row(FirstNaiveGameLoop()),
+            row(ActorGameLoop())
+        ) { gameLoop ->
+            // Given
+            val player1 = ScriptedPlayer("Ava")
+            val player2 = ScriptedPlayer("Williams")
+            val sanctuaryCat = SanctuaryCat("sanctuary-cat-1")
 
-        // When
-        ScriptedActionBuilder(player1, player2)
-            // Turn 0 - player 1 active
-            .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
-            // Turn 1 - player 2 active
-            .addTurn()
-            // Turn 2 - player 1 active
-            .addTurn(Step.FirstMainPhaseStep, player1, CastCreatureAction(sanctuaryCat))
-            // Turn 3 - player 2 active
-            .addTurn()
-            // Turn 4 - player 1 active
-            .addTurn(
-                Step.CombatPhaseDeclareAttackersStep,
-                player1,
-                DeclareAttackersAction(sanctuaryCat, player2)
-            )
-            // Play
-            .playTurns(instantiateGameLoop())
+            // When
+            ScriptedActionBuilder(player1, player2)
+                // Turn 0 - player 1 active
+                .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
+                // Turn 1 - player 2 active
+                .addTurn()
+                // Turn 2 - player 1 active
+                .addTurn(Step.FirstMainPhaseStep, player1, CastCreatureAction(sanctuaryCat))
+                // Turn 3 - player 2 active
+                .addTurn()
+                // Turn 4 - player 1 active
+                .addTurn(
+                    Step.CombatPhaseDeclareAttackersStep,
+                    player1,
+                    DeclareAttackersAction(sanctuaryCat, player2)
+                )
+                // Play
+                .playTurns(gameLoop)
 
-        // Then
-        player1.life shouldBe 20
-        assert(player1.board[1] is SanctuaryCat)
+            // Then
+            player1.life shouldBe 20
+            assert(player1.board[1] is SanctuaryCat)
 
-        player2.life shouldBe 19
-        player2.board.size shouldBe 0
+            player2.life shouldBe 19
+            player2.board.size shouldBe 0
+        }
     }
 
     "Block attacking creatures" {

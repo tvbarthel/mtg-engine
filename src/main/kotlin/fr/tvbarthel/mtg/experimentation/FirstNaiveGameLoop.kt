@@ -9,8 +9,6 @@ import kotlin.math.min
  */
 class FirstNaiveGameLoop : GameLoop() {
 
-    private val attackActions = mutableListOf<AttackAction>()
-    private val blockActions = mutableListOf<BlockAction>()
     private val cleanupActions = mutableListOf<CleanupAction>()
 
     override fun playStep(turnContext: TurnContext, step: Step) {
@@ -67,11 +65,11 @@ class FirstNaiveGameLoop : GameLoop() {
 
     private fun handlePlayerAction(context: StepContext, player: Player, opponent: Player, action: Action) {
         if (action is DeclareAttackersAction) {
-            attackActions.addAll(action.attackActions)
+            context.turnContext.attackActions.addAll(action.attackActions)
         }
 
         if (action is DeclareBlockersAction) {
-            blockActions.addAll(action.blockActions)
+            context.turnContext.blockActions.addAll(action.blockActions)
         }
 
         if (action is PlayLandAction) {
@@ -258,10 +256,10 @@ class FirstNaiveGameLoop : GameLoop() {
         when (context.step) {
             Step.EndingPhaseCleanupStep -> {
                 println("\t cleaning attack actions")
-                attackActions.clear()
+                context.turnContext.attackActions.clear()
 
                 println("\t cleaning block actions")
-                blockActions.clear()
+                context.turnContext.blockActions.clear()
 
                 for (cleanupTarget in cleanupActions) {
                     cleanupTarget.clean()
@@ -323,10 +321,11 @@ class FirstNaiveGameLoop : GameLoop() {
     }
 
     private fun resolveCombatDamages(context: StepContext, attackingPlayer: Player, defendingPlayer: Player) {
-        val blockerMap =
-            blockActions.map { blockAction -> blockAction.blockedCreature.id to blockAction }.toMap()
+        val blockerMap = context.turnContext.blockActions
+            .map { blockAction -> blockAction.blockedCreature.id to blockAction }
+            .toMap()
 
-        for (attackAction in attackActions) {
+        for (attackAction in context.turnContext.attackActions) {
             val blockerAction = blockerMap[attackAction.creatureCard.id]
 
             if (blockerAction != null) {
@@ -403,8 +402,6 @@ class FirstNaiveGameLoop : GameLoop() {
         val hasteModifier = BooleanValueModifier(ghituLavarunner, true)
         ghituLavarunner.haste.addModifier(hasteModifier)
     }
-
-    private class StepContext(val turnContext: TurnContext, val step: Step)
 
     interface CleanupAction {
         fun clean()
