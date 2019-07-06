@@ -13,25 +13,6 @@ class FirstNaiveGameLoop : GameLoop() {
     private val blockActions = mutableListOf<BlockAction>()
     private val cleanupActions = mutableListOf<CleanupAction>()
 
-    override fun playTurn(turnContext: TurnContext) {
-        playStep(turnContext, Step.BeginningPhaseUntapStep)
-        playStep(turnContext, Step.BeginningPhaseUpKeepStep)
-        playStep(turnContext, Step.BeginningPhaseDrawStep)
-
-        playStep(turnContext, Step.FirstMainPhaseStep)
-
-        playStep(turnContext, Step.CombatPhaseBeginningStep)
-        playStep(turnContext, Step.CombatPhaseDeclareAttackersStep)
-        playStep(turnContext, Step.CombatPhaseDeclareBlockersStep)
-        playStep(turnContext, Step.CombatPhaseDamageStep)
-        playStep(turnContext, Step.CombatPhaseEndStep)
-
-        playStep(turnContext, Step.SecondMainPhaseStep)
-
-        playStep(turnContext, Step.EndingPhaseEndStep)
-        playStep(turnContext, Step.EndingPhaseCleanupStep)
-    }
-
     override fun playStep(turnContext: TurnContext, step: Step) {
         val turn = turnContext.turnIndex
         val activePlayer = turnContext.activePlayer

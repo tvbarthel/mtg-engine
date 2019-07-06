@@ -12,7 +12,25 @@ package fr.tvbarthel.mtg.experimentation
  */
 
 abstract class GameLoop {
-    abstract fun playTurn(turnContext: TurnContext)
+
+    fun playTurn(turnContext: TurnContext) {
+        playStep(turnContext, Step.BeginningPhaseUntapStep)
+        playStep(turnContext, Step.BeginningPhaseUpKeepStep)
+        playStep(turnContext, Step.BeginningPhaseDrawStep)
+
+        playStep(turnContext, Step.FirstMainPhaseStep)
+
+        playStep(turnContext, Step.CombatPhaseBeginningStep)
+        playStep(turnContext, Step.CombatPhaseDeclareAttackersStep)
+        playStep(turnContext, Step.CombatPhaseDeclareBlockersStep)
+        playStep(turnContext, Step.CombatPhaseDamageStep)
+        playStep(turnContext, Step.CombatPhaseEndStep)
+
+        playStep(turnContext, Step.SecondMainPhaseStep)
+
+        playStep(turnContext, Step.EndingPhaseEndStep)
+        playStep(turnContext, Step.EndingPhaseCleanupStep)
+    }
 
     abstract fun playStep(turnContext: TurnContext, step: Step)
 
