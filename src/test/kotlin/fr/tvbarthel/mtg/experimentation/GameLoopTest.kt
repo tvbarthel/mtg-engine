@@ -1,7 +1,10 @@
 package fr.tvbarthel.mtg.experimentation
 
+import fr.tvbarthel.mtg.experimentation.actorgameloop.ActorGameLoop
+import io.kotlintest.data.forall
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
+import io.kotlintest.tables.row
 
 fun instantiateGameLoop(): GameLoop {
     return FirstNaiveGameLoop()
@@ -9,27 +12,32 @@ fun instantiateGameLoop(): GameLoop {
 
 class GameLoopTest : StringSpec({
     "Play Land Cards" {
-        // Given
-        val player1 = ScriptedPlayer("Ava")
-        val player2 = ScriptedPlayer("Williams")
+        forall(
+            row(FirstNaiveGameLoop()),
+            row(ActorGameLoop())
+        ) { gameLoop ->
+            // Given
+            val player1 = ScriptedPlayer("Ava")
+            val player2 = ScriptedPlayer("Williams")
 
-        // When
-        ScriptedActionBuilder(player1, player2)
-            // Turn 0 - player 1 active
-            .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
-            // Turn 1 - player 2 active
-            .addTurn()
-            // Turn 2 - player 1 active
-            .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-b")))
-            // Play
-            .playTurns(instantiateGameLoop())
+            // When
+            ScriptedActionBuilder(player1, player2)
+                // Turn 0 - player 1 active
+                .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
+                // Turn 1 - player 2 active
+                .addTurn()
+                // Turn 2 - player 1 active
+                .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-b")))
+                // Play
+                .playTurns(gameLoop)
 
-        // Then
-        player1.board.size shouldBe 2
-        player2.board.size shouldBe 0
+            // Then
+            player1.board.size shouldBe 2
+            player2.board.size shouldBe 0
 
-        assert(player1.board[0] is Plains)
-        assert(player1.board[1] is Plains)
+            assert(player1.board[0] is Plains)
+            assert(player1.board[1] is Plains)
+        }
     }
 
 
