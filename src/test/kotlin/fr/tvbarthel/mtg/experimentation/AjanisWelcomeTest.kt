@@ -1,9 +1,37 @@
 package fr.tvbarthel.mtg.experimentation
 
+import fr.tvbarthel.mtg.experimentation.actorgameloop.ActorGameLoop
+import io.kotlintest.data.forall
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
+import io.kotlintest.tables.row
 
 class AjanisWelcomeTest : StringSpec({
+    "Cast Ajani's welcome" {
+        forall(
+            row(FirstNaiveGameLoop()),
+            row(ActorGameLoop())
+        ) { gameLoop ->
+            // Given
+            val player1 = ScriptedPlayer("Ava")
+            val player2 = ScriptedPlayer("Williams")
+            val ajanisWelcome = AjanisWelcome("card-1")
+
+            // When
+            ScriptedActionBuilder(player1, player2)
+                // Turn 0 - player 1 active
+                .addTurn(Step.FirstMainPhaseStep, player1, CastEnchantmentAction(ajanisWelcome))
+                // Play
+                .playTurns(gameLoop)
+
+            // Then
+            player1.board.size shouldBe 1
+            player1.board[0] shouldBe ajanisWelcome
+
+            player2.board.size shouldBe 0
+        }
+    }
+
     "Trigger Ajani's welcome" {
         // Given
         val player1 = ScriptedPlayer("Ava")

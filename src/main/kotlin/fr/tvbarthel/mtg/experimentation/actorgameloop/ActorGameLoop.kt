@@ -17,6 +17,7 @@ class ActorGameLoop : GameLoop() {
         attachActor(DeclareAttackersActor())
         attachActor(DeclareBlockersActor())
         attachActor(ApplyCombatDamagesActor())
+        attachActor(CastEnchantmentActor())
     }
 
     override fun playStep(turnContext: TurnContext, step: Step) {
