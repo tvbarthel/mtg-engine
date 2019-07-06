@@ -1,10 +1,8 @@
 package fr.tvbarthel.mtg.experimentation.actorgameloop.actor
 
-import fr.tvbarthel.mtg.experimentation.*
-import fr.tvbarthel.mtg.experimentation.actorgameloop.ActorGameLoop
+import fr.tvbarthel.mtg.experimentation.DeclareBlockersAction
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.ResolveActionEvent
-import kotlin.math.min
 
 @Suppress("FoldInitializerAndIfToElvis")
 class DeclareBlockersActor : Actor {

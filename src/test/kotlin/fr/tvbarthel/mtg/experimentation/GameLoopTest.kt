@@ -79,44 +79,49 @@ class GameLoopTest : StringSpec({
     }
 
     "Block attacking creatures" {
-        // Given
-        val player1 = ScriptedPlayer("Ava")
-        val player2 = ScriptedPlayer("Williams")
-        val sanctuaryCatP1 = SanctuaryCat("sanctuary-cat-p1")
-        val sanctuaryCatP2 = SanctuaryCat("sanctuary-cat-p2")
+        forall(
+            row(FirstNaiveGameLoop()),
+            row(ActorGameLoop())
+        ) { gameLoop ->
+            // Given
+            val player1 = ScriptedPlayer("Ava")
+            val player2 = ScriptedPlayer("Williams")
+            val sanctuaryCatP1 = SanctuaryCat("sanctuary-cat-p1")
+            val sanctuaryCatP2 = SanctuaryCat("sanctuary-cat-p2")
 
-        // When
-        ScriptedActionBuilder(player1, player2)
-            // Turn 0 - player 1 active
-            .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
-            // Turn 1 - player 2 active
-            .addTurn(Step.FirstMainPhaseStep, player2, PlayLandAction(Plains("plains-card-p2-a")))
-            // Turn 2 - player 1 active
-            .addTurn(Step.FirstMainPhaseStep, player1, CastCreatureAction(sanctuaryCatP1))
-            // Turn 3 - player 2 active
-            .addTurn(Step.FirstMainPhaseStep, player2, CastCreatureAction(sanctuaryCatP2))
-            // Turn 4 - player 1 active
-            .addTurn(
-                mapOf(
-                    Step.CombatPhaseDeclareAttackersStep to listOf(
-                        Pair(player1, DeclareAttackersAction(sanctuaryCatP1, player2))
-                    ),
-                    Step.CombatPhaseDeclareBlockersStep to listOf(
-                        Pair(player2, DeclareBlockersAction(sanctuaryCatP1, sanctuaryCatP2))
+            // When
+            ScriptedActionBuilder(player1, player2)
+                // Turn 0 - player 1 active
+                .addTurn(Step.FirstMainPhaseStep, player1, PlayLandAction(Plains("plains-card-p1-a")))
+                // Turn 1 - player 2 active
+                .addTurn(Step.FirstMainPhaseStep, player2, PlayLandAction(Plains("plains-card-p2-a")))
+                // Turn 2 - player 1 active
+                .addTurn(Step.FirstMainPhaseStep, player1, CastCreatureAction(sanctuaryCatP1))
+                // Turn 3 - player 2 active
+                .addTurn(Step.FirstMainPhaseStep, player2, CastCreatureAction(sanctuaryCatP2))
+                // Turn 4 - player 1 active
+                .addTurn(
+                    mapOf(
+                        Step.CombatPhaseDeclareAttackersStep to listOf(
+                            Pair(player1, DeclareAttackersAction(sanctuaryCatP1, player2))
+                        ),
+                        Step.CombatPhaseDeclareBlockersStep to listOf(
+                            Pair(player2, DeclareBlockersAction(sanctuaryCatP1, sanctuaryCatP2))
+                        )
                     )
                 )
-            )
-            // Play
-            .playTurns(instantiateGameLoop())
+                // Play
+                .playTurns(gameLoop)
 
-        // Then
-        player1.life shouldBe 20
-        assert(player1.board[0] is Plains)
-        assert(player1.board[1] is SanctuaryCat)
+            // Then
+            player1.life shouldBe 20
+            assert(player1.board[0] is Plains)
+            assert(player1.board[1] is SanctuaryCat)
 
-        player2.life shouldBe 20
-        assert(player2.board[0] is Plains)
-        assert(player2.board[1] is SanctuaryCat)
+            player2.life shouldBe 20
+            assert(player2.board[0] is Plains)
+            assert(player2.board[1] is SanctuaryCat)
+        }
     }
 
     "Blocking creature dies" {
