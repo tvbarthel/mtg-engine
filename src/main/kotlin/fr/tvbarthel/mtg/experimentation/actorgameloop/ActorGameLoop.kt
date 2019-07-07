@@ -8,6 +8,7 @@ import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.instant.CastInstantA
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.ResolveActionEvent
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.StartStepEvent
+import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EndStepEvent
 import java.util.*
 
 class ActorGameLoop : GameLoop() {
@@ -22,6 +23,7 @@ class ActorGameLoop : GameLoop() {
         attachActor(DeclareAttackersActor())
         attachActor(DeclareBlockersActor())
         attachActor(ApplyCombatDamagesActor(this))
+        attachActor(CleanToughnessModifierAfterTurnActor())
     }
 
     override fun playStep(turnContext: TurnContext, step: Step) {
@@ -78,6 +80,9 @@ class ActorGameLoop : GameLoop() {
                 break
             }
         }
+
+        val stopStepEvent = EndStepEvent(stepContext)
+        sendEvent(stopStepEvent)
     }
 
     internal fun sendEvent(event: Event) {

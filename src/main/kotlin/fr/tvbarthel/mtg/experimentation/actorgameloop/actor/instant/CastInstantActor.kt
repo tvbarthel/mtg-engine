@@ -1,6 +1,7 @@
 package fr.tvbarthel.mtg.experimentation.actorgameloop.actor.instant
 
 import fr.tvbarthel.mtg.experimentation.CastInstantAction
+import fr.tvbarthel.mtg.experimentation.Shock
 import fr.tvbarthel.mtg.experimentation.actorgameloop.ActorGameLoop
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.Actor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EnteredGraveyardEvent
@@ -22,8 +23,13 @@ class CastInstantActor(private val gameLoop: ActorGameLoop) : Actor {
 
         val player = event.actionContext.activePlayer
         val card = action.instantCard
-        player.graveyard.add(card)
 
+        if (card is Shock) {
+            val shockActor = ShockActor(card, player, gameLoop)
+            shockActor.onEventReceived(event)
+        }
+
+        player.graveyard.add(card)
         val enteredGraveyardEvent = EnteredGraveyardEvent(card, player)
         gameLoop.sendEvent(enteredGraveyardEvent)
     }
