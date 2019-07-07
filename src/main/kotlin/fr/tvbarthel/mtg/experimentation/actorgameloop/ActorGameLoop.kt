@@ -5,10 +5,10 @@ import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.*
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.creature.CastCreatureActor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.enchantment.CastEnchantmentActor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.instant.CastInstantActor
+import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EndStepEvent
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.ResolveActionEvent
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.StartStepEvent
-import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EndStepEvent
 import java.util.*
 
 class ActorGameLoop : GameLoop() {

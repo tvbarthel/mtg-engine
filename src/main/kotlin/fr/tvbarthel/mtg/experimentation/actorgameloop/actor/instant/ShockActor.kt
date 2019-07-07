@@ -50,6 +50,7 @@ class ShockActor(
                 gameLoop.sendEvent(exitBattlefieldEvent)
 
                 targetOwner.board.remove(target)
+                targetOwner.graveyard.add(target)
             }
             return
         }

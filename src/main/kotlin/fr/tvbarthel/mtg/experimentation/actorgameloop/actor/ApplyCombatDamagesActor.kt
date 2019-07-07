@@ -77,6 +77,7 @@ class ApplyCombatDamagesActor(
                     sendExitBattlefieldEvent(blockingCreature, defendingPlayer)
                     defendingPlayer.board.remove(blockingCreature)
                     println("\t Blocking creature $blockingCreature dies.")
+                    defendingPlayer.graveyard.add(blockingCreature)
                 }
             }
 
@@ -87,6 +88,7 @@ class ApplyCombatDamagesActor(
                     sendExitBattlefieldEvent(blockedCreature, attackingPlayer)
                     attackingPlayer.board.remove(blockedCreature)
                     println("\t Blocked creature $blockedCreature dies.")
+                    attackingPlayer.graveyard.add(blockedCreature)
                 }
                 break
             }
