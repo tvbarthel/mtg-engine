@@ -6,4 +6,4 @@ package fr.tvbarthel.mtg.engine
  *
  * https://mtg.gamepedia.com/Card
  */
-class Card
+class Card : Object()
