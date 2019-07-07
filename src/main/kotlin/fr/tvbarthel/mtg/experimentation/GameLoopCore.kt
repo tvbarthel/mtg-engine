@@ -319,6 +319,10 @@ class ModifiableBooleanValue(private val initialValue: Boolean) {
         return modifiers.last().value
     }
 
+    fun addModifier(owner: Any, value: Boolean) {
+        modifiers.add(BooleanValueModifier(owner, value))
+    }
+
     fun addModifier(modifier: BooleanValueModifier) {
         modifiers.add(modifier)
     }
