@@ -2,6 +2,7 @@ package fr.tvbarthel.mtg.experimentation.actorgameloop
 
 import fr.tvbarthel.mtg.experimentation.*
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.*
+import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.creature.CastCreatureActor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.enchantment.CastEnchantmentActor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.ResolveActionEvent
@@ -17,7 +18,7 @@ class ActorGameLoop : GameLoop() {
         attachActor(CastCreatureActor(this))
         attachActor(DeclareAttackersActor())
         attachActor(DeclareBlockersActor())
-        attachActor(ApplyCombatDamagesActor())
+        attachActor(ApplyCombatDamagesActor(this))
         attachActor(CastEnchantmentActor(this))
     }
 

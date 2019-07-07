@@ -1,11 +1,15 @@
 package fr.tvbarthel.mtg.experimentation.actorgameloop.actor
 
 import fr.tvbarthel.mtg.experimentation.*
+import fr.tvbarthel.mtg.experimentation.actorgameloop.ActorGameLoop
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
+import fr.tvbarthel.mtg.experimentation.actorgameloop.event.ExitBattlefieldEvent
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.StartStepEvent
 import kotlin.math.min
 
-class ApplyCombatDamagesActor : Actor {
+class ApplyCombatDamagesActor(
+    private val gameLoop: ActorGameLoop
+) : Actor {
 
     override fun onEventReceived(event: Event) {
         if (event !is StartStepEvent) {
@@ -70,9 +74,9 @@ class ApplyCombatDamagesActor : Actor {
                 if (blockingCreature.isIndestructible()) {
                     println("\t Blocking creature is indestructible. It won't die.")
                 } else {
+                    sendExitBattlefieldEvent(blockingCreature, defendingPlayer)
                     defendingPlayer.board.remove(blockingCreature)
                     println("\t Blocking creature $blockingCreature dies.")
-                    // TODO emit event ?
                 }
             }
 
@@ -80,12 +84,17 @@ class ApplyCombatDamagesActor : Actor {
                 if (blockedCreature.isIndestructible()) {
                     println("\t Blocked creature is indestructible. It won't die.")
                 } else {
+                    sendExitBattlefieldEvent(blockedCreature, attackingPlayer)
                     attackingPlayer.board.remove(blockedCreature)
                     println("\t Blocked creature $blockedCreature dies.")
-                    // TODO emit event ?
                 }
                 break
             }
         }
+    }
+
+    private fun sendExitBattlefieldEvent(card: Card, owner: Player) {
+        val event = ExitBattlefieldEvent(owner, card)
+        gameLoop.sendEvent(event)
     }
 }

@@ -1,13 +1,17 @@
-package fr.tvbarthel.mtg.experimentation.actorgameloop.actor
+package fr.tvbarthel.mtg.experimentation.actorgameloop.actor.creature
 
+import fr.tvbarthel.mtg.experimentation.BenalishMarshal
 import fr.tvbarthel.mtg.experimentation.CastCreatureAction
 import fr.tvbarthel.mtg.experimentation.actorgameloop.ActorGameLoop
+import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.Actor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EnterBattlefieldEvent
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.ResolveActionEvent
 
 @Suppress("FoldInitializerAndIfToElvis")
-class CastCreatureActor(private val gameLoop: ActorGameLoop) : Actor {
+class CastCreatureActor(
+    private val gameLoop: ActorGameLoop
+) : Actor {
 
     override fun onEventReceived(event: Event) {
         if (event !is ResolveActionEvent) {
@@ -23,8 +27,13 @@ class CastCreatureActor(private val gameLoop: ActorGameLoop) : Actor {
         val creatureCard = action.creatureCard
         player.board.add(creatureCard)
 
-        val event = EnterBattlefieldEvent(player, creatureCard)
-        gameLoop.sendEvent(event)
+        if (creatureCard is BenalishMarshal) {
+            val benalishMarshalActor = BenalishMarshalActor(creatureCard, player)
+            gameLoop.attachActor(benalishMarshalActor)
+        }
+
+        val enterBattlefieldEvent = EnterBattlefieldEvent(player, creatureCard)
+        gameLoop.sendEvent(enterBattlefieldEvent)
     }
 
     override fun isAlive(): Boolean = true

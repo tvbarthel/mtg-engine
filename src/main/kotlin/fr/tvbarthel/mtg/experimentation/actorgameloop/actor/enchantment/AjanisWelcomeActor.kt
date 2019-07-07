@@ -8,8 +8,8 @@ import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EnterBattlefieldEven
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
 
 class AjanisWelcomeActor(
-    val card: AjanisWelcome,
-    val owner: Player
+    private val card: AjanisWelcome,
+    private val owner: Player
 ) : Actor {
 
     override fun onEventReceived(event: Event) {
