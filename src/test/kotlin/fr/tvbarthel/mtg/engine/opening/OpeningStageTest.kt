@@ -71,7 +71,8 @@ class OpeningStageTest : StringSpec() {
         "given previous draw with mulligan 1 and 0 when both player keep hand then hand 7 and 6 cards" {
             // given
             val state = GameState(12354890L, players)
-            agent1ActionChooser = { actions -> actions.first { action -> action is KeepHandAction } }
+            agent1ActionChooser =
+                { actions -> actions.first { action -> action is KeepHandAction || action is FromHandToBottomLibrary } }
             agent2ActionChooser = { actions -> actions.first { action -> action is KeepHandAction } }
             player1.mulligan = 1
             player2.mulligan = 0
@@ -87,11 +88,12 @@ class OpeningStageTest : StringSpec() {
             assertEquals(20, state.players[0].health)
             assertEquals(20, state.players[1].health)
         }
-
+//
         "given previous draw with mulligan 2 and 0 when both player keep hand then hand 7 and 6 cards" {
             // given
             val state = GameState(12354890L, players)
-            agent1ActionChooser = { actions -> actions.first { action -> action is KeepHandAction } }
+            agent1ActionChooser =
+                { actions -> actions.first { action -> action is KeepHandAction || action is FromHandToBottomLibrary } }
             agent2ActionChooser = { actions -> actions.first { action -> action is KeepHandAction } }
             player1.mulligan = 2
             player2.mulligan = 0
@@ -112,7 +114,7 @@ class OpeningStageTest : StringSpec() {
             // given
             val state = GameState(12354890L, players)
             agent1ActionChooser =
-                { actions -> actions.first { action -> if (player1.mulligan < 4) action is MulliganHandAction else action is KeepHandAction } }
+                { actions -> actions.first { action -> if (player1.mulligan < 4) action is MulliganHandAction else (action is KeepHandAction || action is FromHandToBottomLibrary) } }
             agent2ActionChooser = { actions -> actions.first { action -> action is KeepHandAction } }
             player1.mulligan = 0
             player2.mulligan = 0
@@ -133,9 +135,9 @@ class OpeningStageTest : StringSpec() {
             // given
             val state = GameState(12354890L, players)
             agent1ActionChooser =
-                { actions -> actions.first { action -> if (player1.mulligan < 4) action is MulliganHandAction else action is KeepHandAction } }
+                { actions -> actions.first { action -> if (player1.mulligan < 4) action is MulliganHandAction else (action is KeepHandAction || action is FromHandToBottomLibrary) } }
             agent2ActionChooser =
-                { actions -> actions.first { action -> if (player2.mulligan < 2) action is MulliganHandAction else action is KeepHandAction } }
+                { actions -> actions.first { action -> if (player2.mulligan < 2) action is MulliganHandAction else (action is KeepHandAction || action is FromHandToBottomLibrary) } }
             player1.mulligan = 0
             player2.mulligan = 0
 
@@ -158,7 +160,7 @@ class OpeningStageTest : StringSpec() {
                 if (actions.find { action -> action is MulliganHandAction } != null) {
                     actions.first { action -> action is MulliganHandAction }
                 } else {
-                    actions.first { action -> action is KeepHandAction }
+                    actions.first { action -> action is KeepHandAction || action is FromHandToBottomLibrary }
                 }
             }
             agent2ActionChooser = { actions -> actions.first { action -> action is KeepHandAction } }
