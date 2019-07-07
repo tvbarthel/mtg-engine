@@ -1,17 +1,11 @@
 package fr.tvbarthel.mtg.experimentation
 
-import fr.tvbarthel.mtg.experimentation.actorgameloop.ActorGameLoop
-import io.kotlintest.data.forall
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
-import io.kotlintest.tables.row
 
 class AjanisWelcomeTest : StringSpec({
     "Cast Ajani's welcome" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")
@@ -33,10 +27,7 @@ class AjanisWelcomeTest : StringSpec({
     }
 
     "Trigger Ajani's welcome" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")

@@ -4,18 +4,30 @@ import fr.tvbarthel.mtg.experimentation.actorgameloop.ActorGameLoop
 import io.kotlintest.data.forall
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
+import io.kotlintest.tables.Row1
 import io.kotlintest.tables.row
 
+@Deprecated("Use forAllGameLoops instead")
 fun instantiateGameLoop(): GameLoop {
     return FirstNaiveGameLoop()
 }
 
+fun instantiateGameLoops(): Array<Row1<GameLoop>> {
+    return arrayOf(
+        row(FirstNaiveGameLoop()),
+        row(ActorGameLoop())
+    )
+}
+
+fun forAllGameLoops(testfn: (GameLoop) -> Unit) {
+    forall(*instantiateGameLoops()) { gameLoop ->
+        testfn(gameLoop)
+    }
+}
+
 class GameLoopTest : StringSpec({
     "Play Land Cards" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")
@@ -41,10 +53,7 @@ class GameLoopTest : StringSpec({
     }
 
     "Attack opponent" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")
@@ -79,10 +88,7 @@ class GameLoopTest : StringSpec({
     }
 
     "Block attacking creatures" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")
@@ -125,10 +131,7 @@ class GameLoopTest : StringSpec({
     }
 
     "Blocking creature dies" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")
@@ -165,10 +168,7 @@ class GameLoopTest : StringSpec({
     }
 
     "Blocked creatures dies" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")

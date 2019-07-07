@@ -1,17 +1,11 @@
 package fr.tvbarthel.mtg.experimentation
 
-import fr.tvbarthel.mtg.experimentation.actorgameloop.ActorGameLoop
-import io.kotlintest.data.forall
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
-import io.kotlintest.tables.row
 
 class GhituLavarunnerTest : StringSpec({
     "Cast Ghitu Lavarunner with no instant in graveyard" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")
@@ -33,10 +27,7 @@ class GhituLavarunnerTest : StringSpec({
     }
 
     "Cast Ghitu Lavarunner with two instants in graveyard" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")
@@ -60,10 +51,7 @@ class GhituLavarunnerTest : StringSpec({
     }
 
     "Cast an instant activate Ghitu Lavarunner bonuses" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")
@@ -93,10 +81,7 @@ class GhituLavarunnerTest : StringSpec({
     }
 
     "Cast extra instant do not re-activate Ghitu Lavarunner bonuses" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")

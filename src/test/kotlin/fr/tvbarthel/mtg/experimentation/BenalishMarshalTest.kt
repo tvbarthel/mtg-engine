@@ -1,17 +1,11 @@
 package fr.tvbarthel.mtg.experimentation
 
-import fr.tvbarthel.mtg.experimentation.actorgameloop.ActorGameLoop
-import io.kotlintest.data.forall
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
-import io.kotlintest.tables.row
 
 class BenalishMarshalTest : StringSpec({
     "Benalish Marshal boost existing creatures" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")
@@ -37,10 +31,7 @@ class BenalishMarshalTest : StringSpec({
     }
 
     "Benalish Marshal stop boosting creatures if it dies" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")

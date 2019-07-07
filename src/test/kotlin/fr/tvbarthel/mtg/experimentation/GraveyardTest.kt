@@ -1,17 +1,11 @@
 package fr.tvbarthel.mtg.experimentation
 
-import fr.tvbarthel.mtg.experimentation.actorgameloop.ActorGameLoop
-import io.kotlintest.data.forall
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
-import io.kotlintest.tables.row
 
 class GraveyardTest : StringSpec({
     "Instant casted are added to graveyard" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")
@@ -30,10 +24,7 @@ class GraveyardTest : StringSpec({
     }
 
     "Creature killed are added to graveyard" {
-        forall(
-            row(FirstNaiveGameLoop()),
-            row(ActorGameLoop())
-        ) { gameLoop ->
+        forAllGameLoops { gameLoop ->
             // Given
             val player1 = ScriptedPlayer("Ava")
             val player2 = ScriptedPlayer("Williams")
@@ -46,7 +37,7 @@ class GraveyardTest : StringSpec({
             ScriptedActionBuilder(player1, player2)
                 // Turn 0 - player 1 active
                 .addTurn(Step.FirstMainPhaseStep, player1, CastInstantAction(shock))
-                .playTurns(instantiateGameLoop())
+                .playTurns(gameLoop)
 
             // Then
             player2.graveyard.size shouldBe 1
