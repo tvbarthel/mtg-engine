@@ -12,5 +12,6 @@ data class Player(
     val id: Int,
     val library: Library = Library(),
     val hand: Hand = Hand(),
-    var health: Int = 0
+    var health: Int = 0,
+    var mulligan: Int = 0 // number of time the player mulligan
 )
