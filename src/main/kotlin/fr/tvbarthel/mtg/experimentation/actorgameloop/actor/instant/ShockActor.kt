@@ -14,7 +14,7 @@ class ShockActor(
     val gameLoop: ActorGameLoop
 ) : Actor {
 
-    override fun onEventReceived(event: Event) {
+    override fun onEventReceived(event: Event, stepContext: StepContext) {
         if (event !is ResolveActionEvent) {
             return
         }
@@ -47,7 +47,7 @@ class ShockActor(
                 val targetOwner = getOwner(turnContext, target)
 
                 val exitBattlefieldEvent = ExitBattlefieldEvent(targetOwner, target)
-                gameLoop.sendEvent(exitBattlefieldEvent)
+                gameLoop.sendEvent(exitBattlefieldEvent, stepContext)
 
                 targetOwner.board.remove(target)
                 targetOwner.graveyard.add(target)

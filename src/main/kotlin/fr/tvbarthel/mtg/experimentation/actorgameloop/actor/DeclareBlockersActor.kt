@@ -1,13 +1,14 @@
 package fr.tvbarthel.mtg.experimentation.actorgameloop.actor
 
 import fr.tvbarthel.mtg.experimentation.DeclareBlockersAction
+import fr.tvbarthel.mtg.experimentation.StepContext
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.ResolveActionEvent
 
 @Suppress("FoldInitializerAndIfToElvis")
 class DeclareBlockersActor : Actor {
 
-    override fun onEventReceived(event: Event) {
+    override fun onEventReceived(event: Event, stepContext: StepContext) {
         if (event !is ResolveActionEvent) {
             return
         }

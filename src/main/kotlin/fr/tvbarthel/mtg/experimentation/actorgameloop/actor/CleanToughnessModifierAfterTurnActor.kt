@@ -1,15 +1,12 @@
 package fr.tvbarthel.mtg.experimentation.actorgameloop.actor
 
-import fr.tvbarthel.mtg.experimentation.Card
-import fr.tvbarthel.mtg.experimentation.CreatureCard
-import fr.tvbarthel.mtg.experimentation.Step
-import fr.tvbarthel.mtg.experimentation.TurnContext
+import fr.tvbarthel.mtg.experimentation.*
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EndStepEvent
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
 
 class CleanToughnessModifierAfterTurnActor : Actor {
 
-    override fun onEventReceived(event: Event) {
+    override fun onEventReceived(event: Event, stepContext: StepContext) {
         if (event !is EndStepEvent) {
             return
         }

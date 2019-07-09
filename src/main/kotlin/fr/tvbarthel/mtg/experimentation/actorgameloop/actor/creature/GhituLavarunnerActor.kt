@@ -3,6 +3,7 @@ package fr.tvbarthel.mtg.experimentation.actorgameloop.actor.creature
 import fr.tvbarthel.mtg.experimentation.GhituLavarunner
 import fr.tvbarthel.mtg.experimentation.InstantCard
 import fr.tvbarthel.mtg.experimentation.Player
+import fr.tvbarthel.mtg.experimentation.StepContext
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.Actor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EnterBattlefieldEvent
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EnteredGraveyardEvent
@@ -15,7 +16,7 @@ class GhituLavarunnerActor(
 
     private var bonusActivated = false
 
-    override fun onEventReceived(event: Event) {
+    override fun onEventReceived(event: Event, stepContext: StepContext) {
         if (event is EnterBattlefieldEvent) {
             handleEnterBattlefieldEvent(event)
             return

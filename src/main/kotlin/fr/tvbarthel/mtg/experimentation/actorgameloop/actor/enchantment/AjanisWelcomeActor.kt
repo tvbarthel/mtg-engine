@@ -3,6 +3,7 @@ package fr.tvbarthel.mtg.experimentation.actorgameloop.actor.enchantment
 import fr.tvbarthel.mtg.experimentation.AjanisWelcome
 import fr.tvbarthel.mtg.experimentation.CreatureCard
 import fr.tvbarthel.mtg.experimentation.Player
+import fr.tvbarthel.mtg.experimentation.StepContext
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.Actor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EnterBattlefieldEvent
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
@@ -12,7 +13,7 @@ class AjanisWelcomeActor(
     private val owner: Player
 ) : Actor {
 
-    override fun onEventReceived(event: Event) {
+    override fun onEventReceived(event: Event, stepContext: StepContext) {
         if (event !is EnterBattlefieldEvent) {
             return
         }

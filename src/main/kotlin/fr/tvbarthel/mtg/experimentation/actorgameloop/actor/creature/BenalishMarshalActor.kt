@@ -3,6 +3,7 @@ package fr.tvbarthel.mtg.experimentation.actorgameloop.actor.creature
 import fr.tvbarthel.mtg.experimentation.BenalishMarshal
 import fr.tvbarthel.mtg.experimentation.CreatureCard
 import fr.tvbarthel.mtg.experimentation.Player
+import fr.tvbarthel.mtg.experimentation.StepContext
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.Actor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EnterBattlefieldEvent
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
@@ -13,7 +14,7 @@ class BenalishMarshalActor(
     private val owner: Player
 ) : Actor {
 
-    override fun onEventReceived(event: Event) {
+    override fun onEventReceived(event: Event, stepContext: StepContext) {
         if (event is EnterBattlefieldEvent) {
             handleEnterBattlefieldEvent(event)
             return

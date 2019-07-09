@@ -2,6 +2,7 @@ package fr.tvbarthel.mtg.experimentation.actorgameloop.actor.enchantment
 
 import fr.tvbarthel.mtg.experimentation.AjanisWelcome
 import fr.tvbarthel.mtg.experimentation.CastEnchantmentAction
+import fr.tvbarthel.mtg.experimentation.StepContext
 import fr.tvbarthel.mtg.experimentation.actorgameloop.ActorGameLoop
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.Actor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
@@ -11,7 +12,7 @@ import fr.tvbarthel.mtg.experimentation.actorgameloop.event.ResolveActionEvent
 class CastEnchantmentActor(private val gameLoop: ActorGameLoop) :
     Actor {
 
-    override fun onEventReceived(event: Event) {
+    override fun onEventReceived(event: Event, stepContext: StepContext) {
         if (event !is ResolveActionEvent) {
             return
         }

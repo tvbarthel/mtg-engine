@@ -1,8 +1,6 @@
 package fr.tvbarthel.mtg.experimentation.actorgameloop.actor.creature
 
-import fr.tvbarthel.mtg.experimentation.BenalishMarshal
-import fr.tvbarthel.mtg.experimentation.CastCreatureAction
-import fr.tvbarthel.mtg.experimentation.GhituLavarunner
+import fr.tvbarthel.mtg.experimentation.*
 import fr.tvbarthel.mtg.experimentation.actorgameloop.ActorGameLoop
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.Actor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EnterBattlefieldEvent
@@ -14,7 +12,7 @@ class CastCreatureActor(
     private val gameLoop: ActorGameLoop
 ) : Actor {
 
-    override fun onEventReceived(event: Event) {
+    override fun onEventReceived(event: Event, stepContext: StepContext) {
         if (event !is ResolveActionEvent) {
             return
         }
@@ -31,15 +29,16 @@ class CastCreatureActor(
         if (creatureCard is BenalishMarshal) {
             val benalishMarshalActor = BenalishMarshalActor(creatureCard, player)
             gameLoop.attachActor(benalishMarshalActor)
-        }
-
-        if (creatureCard is GhituLavarunner) {
+        } else if (creatureCard is GhituLavarunner) {
             val ghituLavarunnerActor = GhituLavarunnerActor(creatureCard, player)
             gameLoop.attachActor(ghituLavarunnerActor)
+        } else if (creatureCard is DauntlessBodyguard) {
+            val dauntlessBodyguardActor = DauntlessBodyguardActor(creatureCard, player, gameLoop)
+            gameLoop.attachActor(dauntlessBodyguardActor)
         }
 
         val enterBattlefieldEvent = EnterBattlefieldEvent(player, creatureCard)
-        gameLoop.sendEvent(enterBattlefieldEvent)
+        gameLoop.sendEvent(enterBattlefieldEvent, stepContext)
     }
 
     override fun isAlive(): Boolean = true

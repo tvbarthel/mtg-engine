@@ -11,7 +11,7 @@ class ApplyCombatDamagesActor(
     private val gameLoop: ActorGameLoop
 ) : Actor {
 
-    override fun onEventReceived(event: Event) {
+    override fun onEventReceived(event: Event, stepContext: StepContext) {
         if (event !is StartStepEvent) {
             return
         }
@@ -74,7 +74,7 @@ class ApplyCombatDamagesActor(
                 if (blockingCreature.isIndestructible()) {
                     println("\t Blocking creature is indestructible. It won't die.")
                 } else {
-                    sendExitBattlefieldEvent(blockingCreature, defendingPlayer)
+                    sendExitBattlefieldEvent(blockingCreature, defendingPlayer, context)
                     defendingPlayer.board.remove(blockingCreature)
                     println("\t Blocking creature $blockingCreature dies.")
                     defendingPlayer.graveyard.add(blockingCreature)
@@ -85,7 +85,7 @@ class ApplyCombatDamagesActor(
                 if (blockedCreature.isIndestructible()) {
                     println("\t Blocked creature is indestructible. It won't die.")
                 } else {
-                    sendExitBattlefieldEvent(blockedCreature, attackingPlayer)
+                    sendExitBattlefieldEvent(blockedCreature, attackingPlayer, context)
                     attackingPlayer.board.remove(blockedCreature)
                     println("\t Blocked creature $blockedCreature dies.")
                     attackingPlayer.graveyard.add(blockedCreature)
@@ -95,8 +95,8 @@ class ApplyCombatDamagesActor(
         }
     }
 
-    private fun sendExitBattlefieldEvent(card: Card, owner: Player) {
+    private fun sendExitBattlefieldEvent(card: Card, owner: Player, stepContext: StepContext) {
         val event = ExitBattlefieldEvent(owner, card)
-        gameLoop.sendEvent(event)
+        gameLoop.sendEvent(event, stepContext)
     }
 }

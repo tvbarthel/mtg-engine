@@ -3,6 +3,7 @@ package fr.tvbarthel.mtg.experimentation.actorgameloop
 import fr.tvbarthel.mtg.experimentation.*
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.*
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.creature.CastCreatureActor
+import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.creature.DauntlessBodyguardActor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.enchantment.CastEnchantmentActor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.instant.CastInstantActor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EndStepEvent
@@ -14,6 +15,7 @@ import java.util.*
 class ActorGameLoop : GameLoop() {
 
     private val actors = mutableListOf<Actor>()
+    private var initialized = false
 
     init {
         attachActor(PlayLandActor())
@@ -26,6 +28,15 @@ class ActorGameLoop : GameLoop() {
         attachActor(CleanToughnessModifierAfterTurnActor())
     }
 
+    override fun playTurn(turnContext: TurnContext) {
+        if (!initialized) {
+            initialize(turnContext)
+            initialized = true
+        }
+
+        super.playTurn(turnContext)
+    }
+
     override fun playStep(turnContext: TurnContext, step: Step) {
         val turn = turnContext.turnIndex
         val activePlayer = turnContext.activePlayer
@@ -33,7 +44,7 @@ class ActorGameLoop : GameLoop() {
         val stepContext = StepContext(turnContext, step)
 
         val startStepEvent = StartStepEvent(stepContext)
-        sendEvent(startStepEvent)
+        sendEvent(startStepEvent, stepContext)
 
         val actionStack = Stack<ActionContext>()
         while (true) {
@@ -72,7 +83,7 @@ class ActorGameLoop : GameLoop() {
                         stepContext,
                         actionContext
                     )
-                    sendEvent(event)
+                    sendEvent(event, stepContext)
                 }
             }
 
@@ -82,18 +93,32 @@ class ActorGameLoop : GameLoop() {
         }
 
         val stopStepEvent = EndStepEvent(stepContext)
-        sendEvent(stopStepEvent)
+        sendEvent(stopStepEvent, stepContext)
     }
 
-    internal fun sendEvent(event: Event) {
+    internal fun sendEvent(event: Event, stepContext: StepContext) {
         actors.filter { actor -> actor.isAlive() }
-            .forEach { actor -> actor.onEventReceived(event) }
+            .forEach { actor -> actor.onEventReceived(event, stepContext) }
 
         actors.removeIf { actor -> !actor.isAlive() }
     }
 
     internal fun attachActor(actor: Actor) {
         actors.add(actor)
+    }
+
+    private fun initialize(turnContext: TurnContext) {
+        initializeActors(turnContext.activePlayer)
+        initializeActors(turnContext.opponentPlayer)
+    }
+
+    private fun initializeActors(player: Player) {
+        player.board.forEach { card ->
+            if (card is DauntlessBodyguard) {
+                val dauntlessBodyguardActor = DauntlessBodyguardActor(card, player, this)
+                attachActor(dauntlessBodyguardActor)
+            }
+        }
     }
 
     class ActionContext(val action: Action, val activePlayer: Player, val opponent: Player)
