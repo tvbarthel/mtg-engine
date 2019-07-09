@@ -13,7 +13,7 @@ package fr.tvbarthel.mtg.experimentation
 
 abstract class GameLoop {
 
-    open fun playTurn(turnContext: TurnContext) {
+    fun playTurn(turnContext: TurnContext) {
         playStep(turnContext, Step.BeginningPhaseUntapStep)
         playStep(turnContext, Step.BeginningPhaseUpKeepStep)
         playStep(turnContext, Step.BeginningPhaseDrawStep)

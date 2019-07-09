@@ -5,6 +5,7 @@ import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.*
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.creature.CastCreatureActor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.creature.DauntlessBodyguardActor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.enchantment.CastEnchantmentActor
+import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.enchantment.HistoryOfBenaliaActor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.actor.instant.CastInstantActor
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.EndStepEvent
 import fr.tvbarthel.mtg.experimentation.actorgameloop.event.Event
@@ -28,16 +29,12 @@ class ActorGameLoop : GameLoop() {
         attachActor(CleanToughnessModifierAfterTurnActor())
     }
 
-    override fun playTurn(turnContext: TurnContext) {
+    override fun playStep(turnContext: TurnContext, step: Step) {
         if (!initialized) {
             initialize(turnContext)
             initialized = true
         }
 
-        super.playTurn(turnContext)
-    }
-
-    override fun playStep(turnContext: TurnContext, step: Step) {
         val turn = turnContext.turnIndex
         val activePlayer = turnContext.activePlayer
         val opponentPlayer = turnContext.opponentPlayer
@@ -117,6 +114,9 @@ class ActorGameLoop : GameLoop() {
             if (card is DauntlessBodyguard) {
                 val dauntlessBodyguardActor = DauntlessBodyguardActor(card, player, this)
                 attachActor(dauntlessBodyguardActor)
+            } else if (card is HistoryOfBenalia) {
+                val historyOfBenaliaActor = HistoryOfBenaliaActor(card, player, this)
+                attachActor(historyOfBenaliaActor)
             }
         }
     }

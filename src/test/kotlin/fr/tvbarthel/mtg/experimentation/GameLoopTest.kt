@@ -7,11 +7,6 @@ import io.kotlintest.specs.StringSpec
 import io.kotlintest.tables.Row1
 import io.kotlintest.tables.row
 
-@Deprecated("Use forAllGameLoops instead")
-fun instantiateGameLoop(): GameLoop {
-    return FirstNaiveGameLoop()
-}
-
 fun instantiateGameLoops(): Array<Row1<GameLoop>> {
     return arrayOf(
         row(FirstNaiveGameLoop()),
