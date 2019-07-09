@@ -111,36 +111,38 @@ class DauntlessBodyguardTest : StringSpec({
     }
 
     "Dauntless bodyguard ability save creatures from shock" {
-        // Given
-        val player1 = ScriptedPlayer("Ava")
-        val player2 = ScriptedPlayer("Williams")
+        forAllGameLoops { gameLoop ->
+            // Given
+            val player1 = ScriptedPlayer("Ava")
+            val player2 = ScriptedPlayer("Williams")
 
-        val creatureP2 = FakeCreature("fake-creature-p2", 4, 1)
-        val dauntlessBodyguardP2 = DauntlessBodyguard("dauntless-bodyguard-p2")
-        val dauntlessBodyguardAbility = DauntlessBodyguard.SacrificeToGiveIndestructibleAbility(
-            dauntlessBodyguardP2, creatureP2
-        )
-        dauntlessBodyguardP2.abilities.add(dauntlessBodyguardAbility)
-        player2.board.add(creatureP2)
-        player2.board.add(dauntlessBodyguardP2)
+            val creatureP2 = FakeCreature("fake-creature-p2", 4, 1)
+            val dauntlessBodyguardP2 = DauntlessBodyguard("dauntless-bodyguard-p2")
+            val dauntlessBodyguardAbility = DauntlessBodyguard.SacrificeToGiveIndestructibleAbility(
+                dauntlessBodyguardP2, creatureP2
+            )
+            dauntlessBodyguardP2.abilities.add(dauntlessBodyguardAbility)
+            player2.board.add(creatureP2)
+            player2.board.add(dauntlessBodyguardP2)
 
-        val shock = Shock("p2", creatureP2)
+            val shock = Shock("p2", creatureP2)
 
-        // When
-        ScriptedActionBuilder(player1, player2)
-            // Turn 0 - player 1 active
-            .addTurn(
-                mapOf(
-                    Step.FirstMainPhaseStep to listOf(
-                        Pair(player1, CastInstantAction(shock)),
-                        Pair(player2, ActivateAbilityAction(dauntlessBodyguardAbility))
+            // When
+            ScriptedActionBuilder(player1, player2)
+                // Turn 0 - player 1 active
+                .addTurn(
+                    mapOf(
+                        Step.FirstMainPhaseStep to listOf(
+                            Pair(player1, CastInstantAction(shock)),
+                            Pair(player2, ActivateAbilityAction(dauntlessBodyguardAbility))
+                        )
                     )
                 )
-            )
-            .playTurns(instantiateGameLoop())
+                .playTurns(gameLoop)
 
-        // Then
-        player2.board.size shouldBe 1
-        player2.board[0] shouldBe creatureP2
+            // Then
+            player2.board.size shouldBe 1
+            player2.board[0] shouldBe creatureP2
+        }
     }
 })
