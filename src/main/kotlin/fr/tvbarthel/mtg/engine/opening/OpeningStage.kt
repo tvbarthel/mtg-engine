@@ -30,15 +30,25 @@ class OpeningStage(
             players
                 .filter { it.hand.isEmpty() }
                 .forEach { player ->
-                    val handSize = startingHandSize - player.mulligan
-                    val hand = player.library.take(handSize)
-                    val actions = if (handSize > 1) {
+                    val hand = player.library.take(startingHandSize)
+                    val actions = if (startingHandSize - player.mulligan > 1) {
                         listOf(KeepHandAction(hand, player.id), MulliganHandAction(hand, player.id))
                     } else {
                         listOf(KeepHandAction(hand, player.id))
                     }
                     agents.getValue(player.id).chose(state, actions).apply(state)
                 }
+        }
+
+        // apply London mulligan once starting hand is chosen
+        // https://mtg.gamepedia.com/Mulligan#London_mulligan
+        players.forEach { player ->
+            repeat(player.mulligan) {
+                val actions = player.hand.map { card ->
+                    FromHandToBottomLibrary(card, player.id)
+                }
+                agents.getValue(player.id).chose(state, actions).apply(state)
+            }
         }
 
         return state
