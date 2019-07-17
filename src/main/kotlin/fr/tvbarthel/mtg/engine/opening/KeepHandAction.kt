@@ -15,4 +15,6 @@ class KeepHandAction(val hand: List<Card>, private val playerId: Int) : Action()
         player.hand.addAll(hand)
         return emptyList()
     }
+
+    override fun toString(): String = "Keeping hand $hand"
 }

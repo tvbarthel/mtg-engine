@@ -24,4 +24,6 @@ class FromHandToBottomLibrary(
         return emptyList()
     }
 
+    override fun toString(): String = "Mulligan bottom $card"
+
 }

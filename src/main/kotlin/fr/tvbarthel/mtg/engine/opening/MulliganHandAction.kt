@@ -13,4 +13,6 @@ class MulliganHandAction(val hand: List<Card>, private val playerId: Int) : Acti
         state.players.find { it.id == playerId }!!.mulligan += 1
         return emptyList()
     }
+
+    override fun toString(): String = "Mulligan hand $hand"
 }
