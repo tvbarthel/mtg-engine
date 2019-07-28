@@ -17,4 +17,6 @@ class MulliganHandAction(val hand: List<Card>, private val playerId: Int) : Acti
         }
         return emptyList()
     }
+
+    override fun toString(): String = "Mulligan hand $hand"
 }

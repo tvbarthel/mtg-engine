@@ -1,3 +1,18 @@
+import fr.tvbarthel.mtg.engine.*
+import fr.tvbarthel.mtg.engine.agent.ConsoleAgent
+import fr.tvbarthel.mtg.engine.agent.RandomAgent
+import kotlin.random.Random
+
 fun main() {
-    println("HelloWorld")
+    val engine = GameEngine()
+
+    val seed = Random.nextLong()
+    val player1 = Player(1).apply { repeat(60) { library.add(Card()) } }
+    val player2 = Player(2).apply { repeat(60) { library.add(Card()) } }
+    val state = GameState(seed, listOf(player1, player2))
+
+    val config = GameConfig(state, mapOf(1 to RandomAgent(), 2 to ConsoleAgent()))
+    val result = engine.simulate(config)
+
+    println("$result")
 }
