@@ -9,6 +9,7 @@ import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.impl.annotations.SpyK
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 /**
  * Ensure that [MulliganHandAction] behavior is the expected one and won't break in the future.
@@ -41,6 +42,7 @@ class MulliganHandActionTest : StringSpec() {
 
         "given hand when apply then player hand empty"{
             // given
+            mockedLibrary.clear()
             mockedLibrary.addAll(listOf(mockk(), mockk(), mockk(), mockk()))
             val hand = mockedLibrary.take(3)
 
@@ -50,6 +52,22 @@ class MulliganHandActionTest : StringSpec() {
             // then
             assert(mockedHand.isEmpty())
             assertEquals(4, mockedLibrary.size)
+            verify { mockedPlayer2 wasNot Called }
+        }
+
+        "given hand when apply then player library shuffled"{
+            // given
+            mockedLibrary.clear()
+            mockedLibrary.addAll(listOf(mockk(), mockk(), mockk(), mockk()))
+            val initialLibrary = mockedLibrary.toList()
+            val hand = mockedLibrary.take(3)
+
+            // when
+            MulliganHandAction(hand, 1).apply(mockedState)
+
+            // then
+            assertNotEquals(initialLibrary, mockedPlayer1.library.toList())
+            assertEquals(4, mockedPlayer1.library.size)
             verify { mockedPlayer2 wasNot Called }
         }
     }
