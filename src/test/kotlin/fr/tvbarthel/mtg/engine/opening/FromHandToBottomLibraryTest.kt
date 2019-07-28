@@ -3,6 +3,7 @@ package fr.tvbarthel.mtg.engine.opening
 import fr.tvbarthel.mtg.engine.Card
 import fr.tvbarthel.mtg.engine.GameState
 import fr.tvbarthel.mtg.engine.Player
+import fr.tvbarthel.mtg.engine.card.white.Plains
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.StringSpec
 import io.mockk.MockKAnnotations
@@ -29,7 +30,7 @@ class FromHandToBottomLibraryTest : StringSpec() {
         "given card inside hand when apply then card at bottom of library" {
             // given
             player.hand.add(card)
-            repeat(10) { player.library.add(Card()) }
+            repeat(10) { player.library.add(Plains()) }
             val state = GameState(12354890L, listOf(player))
 
             // when
@@ -42,7 +43,7 @@ class FromHandToBottomLibraryTest : StringSpec() {
 
         "given card not inside hand when apply then exception" {
             // given
-            repeat(10) { player.library.add(Card()) }
+            repeat(10) { player.library.add(Plains()) }
             val state = GameState(12354890L, listOf(player))
 
             // when

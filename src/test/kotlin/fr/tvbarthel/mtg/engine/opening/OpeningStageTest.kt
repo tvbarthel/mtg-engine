@@ -1,6 +1,7 @@
 package fr.tvbarthel.mtg.engine.opening
 
 import fr.tvbarthel.mtg.engine.*
+import fr.tvbarthel.mtg.engine.card.white.Plains
 import io.kotlintest.TestCase
 import io.kotlintest.specs.StringSpec
 import io.mockk.MockKAnnotations
@@ -36,10 +37,10 @@ class OpeningStageTest : StringSpec() {
 
         MockKAnnotations.init(this)
         player1 = Player(1)
-        repeat(60) { player1.library.add(Card()) }
+        repeat(60) { player1.library.add(Plains()) }
 
         player2 = Player(2)
-        repeat(60) { player2.library.add(Card()) }
+        repeat(60) { player2.library.add(Plains()) }
 
         agents = mapOf(player1.id to agent1, player2.id to agent2)
         players = mutableListOf(player1, player2)

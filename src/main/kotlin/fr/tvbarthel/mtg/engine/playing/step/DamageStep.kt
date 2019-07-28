@@ -11,6 +11,7 @@ import fr.tvbarthel.mtg.engine.Step
  */
 class DamageStep : Step {
     override fun proceed(agents: Map<Int, Agent>, state: GameState): GameState {
+        state.nonActivePlayers().forEach { it.health = 0 }
         return state
     }
 }
